@@ -1,0 +1,49 @@
+export type DayId = 1 | 2 | 3
+
+/** A single logged working set. */
+export interface SetEntry {
+  weight: number | null
+  reps: number | null
+  done: boolean
+  /** Drop sets never count toward PRs. Fixed at creation so added sets stay clean. */
+  isDropSet: boolean
+}
+
+export interface LoggedExercise {
+  exerciseId: string
+  /** One flag per prescribed warmup set. Warmups are tick-only: no load, no PRs. */
+  warmupsDone: boolean[]
+  sets: SetEntry[]
+}
+
+export interface Workout {
+  id: string
+  dayId: DayId
+  /** ISO date string. */
+  date: string
+  exercises: LoggedExercise[]
+}
+
+/** A tested one-rep max. Entered by hand, kept apart from training PRs. */
+export interface MaxEntry {
+  id: string
+  liftId: string
+  weight: number
+  date: string
+}
+
+export interface PersonalRecord {
+  /** Heaviest load ever lifted; reps break ties. */
+  topSetWeight: number
+  topSetReps: number
+  /** Best Epley estimate ever produced. */
+  e1rm: number
+}
+
+export interface IronLogBackup {
+  app: 'ironlog'
+  version: 1
+  exportedAt: string
+  workouts: Workout[]
+  maxes: MaxEntry[]
+}
