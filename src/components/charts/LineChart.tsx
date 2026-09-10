@@ -15,6 +15,8 @@ interface LineChartProps {
   suffix?: string
   /** Compact mode for the dashboard mini chart: no axes, no dots. */
   minimal?: boolean
+  /** Renders the axis ticks and tooltip value, for units that are not plain numbers (times). */
+  format?: (value: number) => string
 }
 
 export function LineChart({
@@ -23,6 +25,7 @@ export function LineChart({
   color = '#FF6B18',
   suffix = 'kg',
   minimal = false,
+  format,
 }: LineChartProps) {
   const wrapRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
@@ -99,7 +102,7 @@ export function LineChart({
         .call((sel) => sel.selectAll('line').attr('stroke', '#243049').attr('stroke-dasharray', '3 4'))
 
       g.append('g')
-        .call(d3.axisLeft(y).ticks(5).tickFormat((d) => `${d}`))
+        .call(d3.axisLeft(y).ticks(5).tickFormat((d) => (format ? format(d as number) : `${d}`)))
         .call((sel) => sel.select('.domain').remove())
         .call((sel) => sel.selectAll('line').remove())
         .call((sel) =>
@@ -218,7 +221,7 @@ export function LineChart({
         focus.select('.focus-line').attr('transform', `translate(${px},0)`)
         focus.select('circle').attr('cx', px).attr('cy', py)
 
-        labelValue.text(`${Number(point.value.toFixed(1))} ${suffix}`)
+        labelValue.text(format ? format(point.value) : `${Number(point.value.toFixed(1))} ${suffix}`)
         labelDate.text(point.detail ?? d3.timeFormat('%-d %b %Y')(point.date))
 
         const textW = Math.max(
@@ -234,7 +237,7 @@ export function LineChart({
         labelDate.attr('x', boxX + 10).attr('y', boxY + 31)
       })
       .on('pointerleave', () => focus.style('display', 'none'))
-  }, [points, width, height, color, suffix, minimal])
+  }, [points, width, height, color, suffix, minimal, format])
 
   return (
     <div ref={wrapRef} className="w-full">

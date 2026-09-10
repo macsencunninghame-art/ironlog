@@ -1,6 +1,7 @@
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import {
   Dumbbell,
+  Footprints,
   History,
   LayoutGrid,
   ListChecks,
@@ -14,14 +15,19 @@ import { Avatar } from './Avatar'
 import { StorageWarning } from './StorageWarning'
 import { usePerson } from './PersonScope'
 
-/** Paths are relative to the person, so the same tabs work for everyone. */
+/**
+ * Paths are relative to the person, so the same tabs work for everyone.
+ * `short` is what the mobile tab bar uses - at seven tabs on a small phone the
+ * full words no longer fit without truncating mid-syllable.
+ */
 const NAV = [
-  { sub: '', label: 'Home', icon: LayoutGrid, end: true },
-  { sub: '/log', label: 'Log', icon: PlusCircle, end: false },
-  { sub: '/routines', label: 'Routine', icon: ListChecks, end: false },
-  { sub: '/progress', label: 'Progress', icon: TrendingUp, end: false },
-  { sub: '/maxes', label: 'Maxes', icon: Trophy, end: false },
-  { sub: '/history', label: 'History', icon: History, end: false },
+  { sub: '', label: 'Home', short: 'Home', icon: LayoutGrid, end: true },
+  { sub: '/log', label: 'Log', short: 'Log', icon: PlusCircle, end: false },
+  { sub: '/routines', label: 'Routine', short: 'Routine', icon: ListChecks, end: false },
+  { sub: '/running', label: 'Running', short: 'Run', icon: Footprints, end: false },
+  { sub: '/progress', label: 'Progress', short: 'Progress', icon: TrendingUp, end: false },
+  { sub: '/maxes', label: 'Maxes', short: 'Maxes', icon: Trophy, end: false },
+  { sub: '/history', label: 'History', short: 'History', icon: History, end: false },
 ]
 
 export function Layout() {
@@ -123,22 +129,24 @@ export function Layout() {
         {/* Mobile bottom tabs */}
         <nav className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t border-ink-600/60 bg-ink-950/92 pt-1.5 backdrop-blur-lg lg:hidden">
           <div className="flex items-stretch justify-around">
-            {NAV.map(({ sub, label, icon: Icon, end }) => (
+            {NAV.map(({ sub, short, icon: Icon, end }) => (
               <NavLink
                 key={sub}
                 to={href(sub)}
                 end={end}
                 className={({ isActive }) =>
                   cn(
-                    'flex flex-1 flex-col items-center gap-1 rounded-xl px-1 py-1.5 transition-colors',
+                    'flex min-w-0 flex-1 flex-col items-center gap-1 rounded-xl px-0.5 py-1.5 transition-colors',
                     isActive ? 'text-accent' : 'text-chalk-faint',
                   )
                 }
               >
                 {({ isActive }) => (
                   <>
-                    <Icon className="h-[22px] w-[22px]" strokeWidth={isActive ? 2.6 : 2} />
-                    <span className="text-[10px] font-bold tracking-tight">{label}</span>
+                    <Icon className="h-[21px] w-[21px]" strokeWidth={isActive ? 2.6 : 2} />
+                    <span className="w-full truncate text-center text-[9px] font-bold tracking-tight">
+                      {short}
+                    </span>
                   </>
                 )}
               </NavLink>

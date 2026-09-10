@@ -47,6 +47,30 @@ export interface PersonalRecord {
   e1rm: number
 }
 
+/**
+ * A Bronco: 5 rounds of 20-40-60 m shuttles, 1200 m in total, against the clock.
+ * One number, and lower is better.
+ */
+export interface BroncoEntry {
+  id: string
+  /** ISO date string. */
+  date: string
+  /** Total time in seconds. */
+  seconds: number
+  note?: string
+}
+
+/** A run. Pace is derived, never stored, so it can never disagree with the two figures behind it. */
+export interface RunEntry {
+  id: string
+  date: string
+  distanceKm: number
+  seconds: number
+  note?: string
+  /** Where it came from. Manual today; kept so an import can be told apart later. */
+  source?: 'manual' | 'strava'
+}
+
 export interface IronLogBackup {
   app: 'ironlog'
   version: 1
@@ -55,4 +79,7 @@ export interface IronLogBackup {
   person?: string
   workouts: Workout[]
   maxes: MaxEntry[]
+  /** Optional so backups taken before running was tracked still import. */
+  broncos?: BroncoEntry[]
+  runs?: RunEntry[]
 }

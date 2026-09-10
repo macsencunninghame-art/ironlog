@@ -15,6 +15,8 @@ browser.
 - **Log Workout** — pick Day 1/2/3, tick warmups, log weight × reps per set. PRs flash lime
   as you type. Prescribed sets are pre-filled from last time; add or remove sets on the day.
 - **Routine** — read-only view of all three days with warmup, superset and drop-set markers.
+- **Running** — Bronco tests and logged runs, each with an improvement chart and a comparison
+  across everyone. Separate from lifting, because here lower is better.
 - **Progress** — line chart per exercise (top set or estimated 1RM) and a 12-week volume bar
   chart, plus **Compare everyone**: who is actually improving, measured against their own numbers.
 - **1RM Board** — your tested one-rep maxes, entered by hand, with dated history and a chart.
@@ -78,6 +80,33 @@ and a compact chart on the home picker. Bars there are coloured per person and s
 across all three groups, so a bar twice as long really is twice the improvement — each row is
 labelled with the person's initials too, so it reads without matching colours to the legend.
 
+## Running
+
+Running is deliberately kept out of the lifting log: a Bronco time and a run pace both improve by
+going *down*, and letting them near volume or PR detection would quietly corrupt both.
+
+- **Bronco** — 5 × (20-40-60 m shuttles), 1200 m against the clock. One time per test; the chart
+  wants to head downwards. Improvement is the first test against the latest.
+- **Runs** — distance and time. Pace is derived from those two and never stored, so it cannot
+  disagree with the numbers behind it. Improvement averages the first three runs against the last
+  three, because pace swings with distance and terrain and a single first run is a poor baseline.
+- **Compare** — the same principle as lifting: everyone against their own starting point, so the
+  quickest person is not automatically the one improving most. A positive figure always means
+  faster.
+
+Times are entered as `5:42` or `1:05:30`. Anything that is not a time is refused rather than
+guessed at, and only the leading unit may pass 59 — `90:00` is a legitimate ninety minutes.
+
+### Strava
+
+Not connected, and it cannot be from this app as it stands. Strava's OAuth requires the
+`client_secret` in the token exchange and does not document PKCE support, so a static site has
+nowhere to keep that secret — putting it in the frontend hands it to anyone who opens devtools.
+
+Linking it would need a small serverless function on Vercel to hold the secret and perform the
+exchange, a registered Strava API application, and a stored refresh token per person. `RunEntry`
+already carries a `source` field so imported activities can be told apart from hand-entered ones.
+
 ## How things are counted
 
 | Rule | Behaviour |
@@ -89,6 +118,7 @@ labelled with the person's initials too, so it reads without matching colours to
 | First entry | The first time a lift is logged it counts as a PR — nothing to beat yet. |
 | Bodyweight lifts | Reps only. Their PR is the best rep count, and they add no volume. |
 | Volume | `weight × reps` across completed working sets. |
+| Running | Kept apart from lifting. Never counts toward volume, PRs or the week's goal. |
 | Week | Monday to Sunday. Goal is every day of that person's routine, in any order. |
 | Streak | Consecutive weeks where every day of their routine was logged. |
 | Tested 1RMs | Entirely separate from training PRs. They never affect PR detection. |
@@ -139,8 +169,8 @@ launches full-screen and your data persists between sessions.
 
 ## Your data
 
-Each person's log is stored in this browser under `ironlog:<person>:workouts` and
-`ironlog:<person>:maxes` — so `ironlog:macsy:workouts`, `ironlog:mitchy:maxes`, and so on.
+Each person's log is stored in this browser under `ironlog:<person>:workouts`,
+`ironlog:<person>:maxes`, `ironlog:<person>:broncos` and `ironlog:<person>:runs` — so `ironlog:macsy:workouts`, `ironlog:mitchy:maxes`, and so on.
 
 Photos are different. They live in **IndexedDB** (`ironlog-photos`), because a single compressed
 photo is larger than an entire training history and a handful would blow the ~5 MB localStorage

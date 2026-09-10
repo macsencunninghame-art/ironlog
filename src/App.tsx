@@ -6,6 +6,7 @@ import { LogWorkout } from './pages/LogWorkout'
 import { Routines } from './pages/Routines'
 import { Progress } from './pages/Progress'
 import { Maxes } from './pages/Maxes'
+import { Running } from './pages/Running'
 import { HistoryPage } from './pages/History'
 
 export default function App() {
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="routines" element={<Routines />} />
         <Route path="progress" element={<Progress />} />
         <Route path="maxes" element={<Maxes />} />
+        <Route path="running" element={<Running />} />
         <Route path="history" element={<HistoryPage />} />
         <Route path="*" element={<Dashboard />} />
       </Route>

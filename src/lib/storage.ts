@@ -82,7 +82,7 @@ function hasKey(key: string): boolean {
   return rawGet(key) !== null
 }
 
-export type DataKind = 'workouts' | 'maxes'
+export type DataKind = 'workouts' | 'maxes' | 'broncos' | 'runs'
 
 /** Where one person's data of a given kind lives. */
 export function storageKey(personId: string, kind: DataKind): string {
@@ -110,7 +110,8 @@ export function activeKey(kind: DataKind): string {
 }
 
 /** Keys used before the app knew about more than one person. */
-const LEGACY_KEYS: Record<DataKind, string> = {
+/** Only these two existed before the app knew about more than one person. */
+const LEGACY_KEYS: Partial<Record<DataKind, string>> = {
   workouts: 'ironlog:workouts',
   maxes: 'ironlog:maxes',
 }
@@ -126,6 +127,7 @@ const LEGACY_KEYS: Record<DataKind, string> = {
 export function migrateLegacyPerson(personId: string): void {
   for (const kind of ['workouts', 'maxes'] as const) {
     const from = LEGACY_KEYS[kind]
+    if (!from) continue
     const to = storageKey(personId, kind)
     const raw = rawGet(from)
     if (raw === null || hasKey(to)) continue

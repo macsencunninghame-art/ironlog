@@ -1,7 +1,8 @@
-import type { IronLogBackup, MaxEntry, Workout } from '@/types'
+import type { BroncoEntry, IronLogBackup, MaxEntry, RunEntry, Workout } from '@/types'
 import { activeKey, getActivePersonId, readJSON, storageKey, writeJSON } from './storage'
 import { readMaxes, writeMaxes } from './maxes'
 import { findPerson } from './people'
+import { getBroncos, getRuns } from './running'
 
 /**
  * Every logged session, newest first.
@@ -63,6 +64,8 @@ export function buildBackup(): IronLogBackup {
     person: activePerson()?.name,
     workouts: getWorkouts(),
     maxes: readMaxes(),
+    broncos: getBroncos(),
+    runs: getRuns(),
   }
 }
 
@@ -112,8 +115,27 @@ export function restoreBackup(raw: string): ImportResult {
       )
     : []
 
+  const broncos = Array.isArray(data.broncos)
+    ? data.broncos.filter(
+        (b): b is BroncoEntry =>
+          !!b && typeof b.id === 'string' && typeof b.seconds === 'number' && typeof b.date === 'string',
+      )
+    : []
+  const runs = Array.isArray(data.runs)
+    ? data.runs.filter(
+        (r): r is RunEntry =>
+          !!r &&
+          typeof r.id === 'string' &&
+          typeof r.distanceKm === 'number' &&
+          typeof r.seconds === 'number' &&
+          typeof r.date === 'string',
+      )
+    : []
+
   writeJSON(activeKey('workouts'), workouts)
   writeMaxes(maxes)
+  writeJSON(activeKey('broncos'), broncos)
+  writeJSON(activeKey('runs'), runs)
 
   const into = activePerson()?.name
   // A file exported by someone else overwrites whoever is logged in now, so say so.
@@ -123,8 +145,10 @@ export function restoreBackup(raw: string): ImportResult {
   return {
     ok: true,
     message:
-      `Restored ${workouts.length} workout${workouts.length === 1 ? '' : 's'} and ` +
-      `${maxes.length} max${maxes.length === 1 ? '' : 'es'}${into ? ` into ${into}` : ''}.${crossed}`,
+      `Restored ${workouts.length} workout${workouts.length === 1 ? '' : 's'}, ` +
+      `${maxes.length} max${maxes.length === 1 ? '' : 'es'} and ` +
+      `${broncos.length + runs.length} running entr${broncos.length + runs.length === 1 ? 'y' : 'ies'}` +
+      `${into ? ` into ${into}` : ''}.${crossed}`,
     workouts: workouts.length,
     maxes: maxes.length,
   }
