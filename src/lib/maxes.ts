@@ -1,5 +1,5 @@
 import type { MaxEntry } from '@/types'
-import { readJSON, STORAGE_KEYS, writeJSON } from './storage'
+import { activeKey, readJSON, writeJSON } from './storage'
 import { uid } from './utils'
 
 /**
@@ -30,12 +30,12 @@ export const MAX_LIFTS: MaxLift[] = [
 ]
 
 export function readMaxes(): MaxEntry[] {
-  const stored = readJSON<MaxEntry[]>(STORAGE_KEYS.maxes, [])
+  const stored = readJSON<MaxEntry[]>(activeKey('maxes'), [])
   return Array.isArray(stored) ? stored : []
 }
 
 export function writeMaxes(entries: MaxEntry[]): void {
-  writeJSON(STORAGE_KEYS.maxes, entries)
+  writeJSON(activeKey('maxes'), entries)
 }
 
 /** Full dated history for one lift, oldest first. */

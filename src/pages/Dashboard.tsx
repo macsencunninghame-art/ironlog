@@ -13,6 +13,7 @@ import {
   workoutsThisWeek,
 } from '@/lib/stats'
 import { getWorkouts } from '@/lib/workouts'
+import { usePerson } from '@/components/PersonScope'
 import { fmtKg, fmtVolume, relativeDay } from '@/lib/utils'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -22,6 +23,7 @@ import { LineChart } from '@/components/charts/LineChart'
 
 export function Dashboard() {
   const navigate = useNavigate()
+  const { person, href } = usePerson()
   const workouts = useMemo(() => getWorkouts(), [])
 
   const suggested = suggestNextDay(workouts)
@@ -74,7 +76,7 @@ export function Dashboard() {
 
         <div className="relative">
           <p className="text-[11px] font-bold uppercase tracking-widest text-flame">
-            {workouts.length ? 'Up next' : 'Welcome to IronLog'}
+            {workouts.length ? 'Up next' : `Welcome to IronLog, ${person.name}`}
           </p>
           <h1 className="mt-2 text-3xl font-black leading-tight tracking-tight sm:text-4xl">
             Day {suggestedDay.id}
@@ -87,7 +89,7 @@ export function Dashboard() {
           <Button
             size="lg"
             className="mt-5 w-full sm:w-auto"
-            onClick={() => navigate(`/log?day=${suggestedDay.id}`)}
+            onClick={() => navigate(href(`/log?day=${suggestedDay.id}`))}
           >
             <Play className="h-5 w-5" fill="currentColor" />
             Start workout
@@ -101,7 +103,7 @@ export function Dashboard() {
           <h2 className="text-xs font-bold uppercase tracking-widest text-chalk-muted">This week</h2>
           <span className="num text-xs font-bold text-chalk-faint">{done.size} of 3</span>
         </div>
-        <WeekTracker done={done} onPick={(day) => navigate(`/log?day=${day}`)} />
+        <WeekTracker done={done} onPick={(day) => navigate(href(`/log?day=${day}`))} />
       </div>
 
       {/* Stats */}
@@ -140,7 +142,7 @@ export function Dashboard() {
             <p className="text-[11px] font-semibold text-chalk-faint">Top set progression</p>
           </div>
           <Link
-            to="/progress"
+            to={href("/progress")}
             className="flex shrink-0 items-center gap-1 text-xs font-bold text-flame hover:text-flame-soft"
           >
             All charts
@@ -168,7 +170,7 @@ export function Dashboard() {
           <h2 className="text-sm font-bold">Recent activity</h2>
           {workouts.length > 0 && (
             <Link
-              to="/history"
+              to={href("/history")}
               className="flex items-center gap-1 text-xs font-bold text-flame hover:text-flame-soft"
             >
               History
@@ -184,7 +186,7 @@ export function Dashboard() {
               return (
                 <Link
                   key={workout.id}
-                  to="/history"
+                  to={href("/history")}
                   className="flex items-center gap-3 rounded-2xl bg-ink-900/50 p-3 transition-colors hover:bg-ink-700/50"
                 >
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-flame to-hot text-sm font-black text-white">

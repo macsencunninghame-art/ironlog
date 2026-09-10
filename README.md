@@ -1,10 +1,13 @@
 # IronLog
 
-A personal gym tracker for one fixed 3-day full body split. Mobile-first, all weights in
-kilograms, no backend, no accounts. Everything lives in your browser.
+A gym tracker for one fixed 3-day full body split, shared by a few people on the same
+device. Mobile-first, all weights in kilograms, no backend, no accounts. Everything lives in
+your browser.
 
 ## What it does
 
+- **Home** - pick who is lifting. Everyone gets their own log; the card shows their session
+  count and when they last trained.
 - **Dashboard** — suggests your next day, tracks the week's 3-workout goal, shows streak,
   volume, sessions and PRs, plus a progression chart and recent activity.
 - **Log Workout** — pick Day 1/2/3, tick warmups, log weight × reps per set. PRs flash lime
@@ -13,6 +16,20 @@ kilograms, no backend, no accounts. Everything lives in your browser.
 - **Progress** — line chart per exercise (top set or estimated 1RM) and a 12-week volume bar chart.
 - **1RM Board** — your tested one-rep maxes, entered by hand, with dated history and a chart.
 - **History** — every past session, expandable, filterable by day, deletable. Export/import backup.
+
+## Who uses it
+
+The roster is hardcoded in `src/lib/people.ts`, the same way the routine is. Right now that is
+**Macsy** and **Mitchy**. Everyone trains the same three days - what is separate is the log.
+
+Each person's workouts, tested maxes, PRs, streak and charts are entirely their own. Nothing
+one person logs can appear in the other's numbers. The person is part of the URL, so
+`/p/macsy/progress` and `/p/mitchy/progress` are different pages, and **Switch person** in the
+sidebar (or the name chip in the mobile header) goes back to the picker.
+
+To add someone, add an entry to `PEOPLE` with an unused accent. Avatars are drawn from each
+person's initials rather than uploaded - the app ships no image assets and stores nothing on a
+server.
 
 ## The routine is fixed
 
@@ -81,14 +98,20 @@ launches full-screen and your data persists between sessions.
 
 ## Your data
 
-Everything is stored in this browser under `ironlog:workouts` and `ironlog:maxes`. Nothing is
-sent anywhere. That means:
+Each person's data is stored in this browser under `ironlog:<person>:workouts` and
+`ironlog:<person>:maxes` - so `ironlog:macsy:workouts`, `ironlog:mitchy:maxes`, and so on.
+Nothing is sent anywhere. That means:
 
 - Clearing your browsing data **erases your training log**.
 - The log does not sync between your phone and your laptop — they each keep their own.
 
 Use **Export** on the History page now and again and keep the JSON file somewhere safe.
-**Import** restores it, replacing whatever is currently stored.
+Backups are per person: the file is named after whoever is logged in and stamped with their
+name, and **Import** replaces the log of whoever you are currently in - it will tell you if the
+file came from someone else.
+
+A log written before the app supported more than one person is moved into Macsy's namespace
+automatically on first load, so nothing is lost in the upgrade.
 
 If a browser blocks local storage entirely (private mode, blocked cookies), the app falls back
 to memory for the session and shows a warning banner rather than crashing.

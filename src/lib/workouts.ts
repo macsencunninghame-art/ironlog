@@ -1,6 +1,7 @@
 import type { IronLogBackup, MaxEntry, Workout } from '@/types'
-import { readJSON, STORAGE_KEYS, writeJSON } from './storage'
+import { activeKey, getActivePersonId, readJSON, storageKey, writeJSON } from './storage'
 import { readMaxes, writeMaxes } from './maxes'
+import { findPerson } from './people'
 
 /**
  * Every logged session, newest first.
@@ -8,7 +9,19 @@ import { readMaxes, writeMaxes } from './maxes'
  * from the first real workout, so every number on screen was actually lifted.
  */
 export function getWorkouts(): Workout[] {
-  const stored = readJSON<Workout[]>(STORAGE_KEYS.workouts, [])
+  return sortedFrom(activeKey('workouts'))
+}
+
+/**
+ * Another person's log, without making them the active one.
+ * The picker needs a session count per person before anyone has been chosen.
+ */
+export function getWorkoutsFor(personId: string): Workout[] {
+  return sortedFrom(storageKey(personId, 'workouts'))
+}
+
+function sortedFrom(key: string): Workout[] {
+  const stored = readJSON<Workout[]>(key, [])
   if (!Array.isArray(stored)) return []
   return [...stored].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 }
@@ -19,21 +32,26 @@ export function getWorkoutsChronological(): Workout[] {
 }
 
 export function saveWorkout(workout: Workout): void {
-  const all = readJSON<Workout[]>(STORAGE_KEYS.workouts, [])
+  const all = readJSON<Workout[]>(activeKey('workouts'), [])
   const next = Array.isArray(all) ? [...all] : []
   const existing = next.findIndex((w) => w.id === workout.id)
   if (existing >= 0) next[existing] = workout
   else next.push(workout)
-  writeJSON(STORAGE_KEYS.workouts, next)
+  writeJSON(activeKey('workouts'), next)
 }
 
 export function deleteWorkout(id: string): void {
-  const all = readJSON<Workout[]>(STORAGE_KEYS.workouts, [])
+  const all = readJSON<Workout[]>(activeKey('workouts'), [])
   if (!Array.isArray(all)) return
   writeJSON(
-    STORAGE_KEYS.workouts,
+    activeKey('workouts'),
     all.filter((w) => w.id !== id),
   )
+}
+
+/** Who the active log belongs to, for stamping and naming exports. */
+function activePerson() {
+  return findPerson(getActivePersonId())
 }
 
 export function buildBackup(): IronLogBackup {
@@ -41,6 +59,8 @@ export function buildBackup(): IronLogBackup {
     app: 'ironlog',
     version: 1,
     exportedAt: new Date().toISOString(),
+    // Stamped so a file found months later says whose training it is.
+    person: activePerson()?.name,
     workouts: getWorkouts(),
     maxes: readMaxes(),
   }
@@ -51,8 +71,9 @@ export function downloadBackup(): void {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   const stamp = new Date().toISOString().slice(0, 10)
+  const who = activePerson()?.id
   a.href = url
-  a.download = `ironlog-backup-${stamp}.json`
+  a.download = who ? `ironlog-${who}-backup-${stamp}.json` : `ironlog-backup-${stamp}.json`
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)
@@ -66,7 +87,7 @@ export interface ImportResult {
   maxes?: number
 }
 
-/** Replaces everything with the contents of a backup file. */
+/** Replaces the active person's log with the contents of a backup file. */
 export function restoreBackup(raw: string): ImportResult {
   let parsed: unknown
   try {
@@ -91,12 +112,19 @@ export function restoreBackup(raw: string): ImportResult {
       )
     : []
 
-  writeJSON(STORAGE_KEYS.workouts, workouts)
+  writeJSON(activeKey('workouts'), workouts)
   writeMaxes(maxes)
+
+  const into = activePerson()?.name
+  // A file exported by someone else overwrites whoever is logged in now, so say so.
+  const crossed =
+    data.person && into && data.person !== into ? ` That file was exported by ${data.person}.` : ''
 
   return {
     ok: true,
-    message: `Restored ${workouts.length} workout${workouts.length === 1 ? '' : 's'} and ${maxes.length} max${maxes.length === 1 ? '' : 'es'}.`,
+    message:
+      `Restored ${workouts.length} workout${workouts.length === 1 ? '' : 's'} and ` +
+      `${maxes.length} max${maxes.length === 1 ? '' : 'es'}${into ? ` into ${into}` : ''}.${crossed}`,
     workouts: workouts.length,
     maxes: maxes.length,
   }

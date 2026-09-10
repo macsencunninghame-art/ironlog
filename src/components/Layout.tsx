@@ -1,23 +1,37 @@
-import { NavLink, Outlet } from 'react-router-dom'
-import { Dumbbell, History, LayoutGrid, ListChecks, PlusCircle, TrendingUp, Trophy } from 'lucide-react'
+import { Link, NavLink, Outlet } from 'react-router-dom'
+import {
+  Dumbbell,
+  History,
+  LayoutGrid,
+  ListChecks,
+  PlusCircle,
+  TrendingUp,
+  Trophy,
+  Users,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { isEphemeral } from '@/lib/storage'
+import { Avatar } from './Avatar'
+import { StorageWarning } from './StorageWarning'
+import { usePerson } from './PersonScope'
 
+/** Paths are relative to the person, so the same tabs work for everyone. */
 const NAV = [
-  { to: '/', label: 'Home', icon: LayoutGrid, end: true },
-  { to: '/log', label: 'Log', icon: PlusCircle, end: false },
-  { to: '/routines', label: 'Routine', icon: ListChecks, end: false },
-  { to: '/progress', label: 'Progress', icon: TrendingUp, end: false },
-  { to: '/maxes', label: 'Maxes', icon: Trophy, end: false },
-  { to: '/history', label: 'History', icon: History, end: false },
+  { sub: '', label: 'Home', icon: LayoutGrid, end: true },
+  { sub: '/log', label: 'Log', icon: PlusCircle, end: false },
+  { sub: '/routines', label: 'Routine', icon: ListChecks, end: false },
+  { sub: '/progress', label: 'Progress', icon: TrendingUp, end: false },
+  { sub: '/maxes', label: 'Maxes', icon: Trophy, end: false },
+  { sub: '/history', label: 'History', icon: History, end: false },
 ]
 
 export function Layout() {
+  const { person, href } = usePerson()
+
   return (
     <div className="min-h-full lg:flex">
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:border-r lg:border-ink-600/60 lg:bg-ink-950/40 lg:p-6">
-        <div className="mb-10 flex items-center gap-3">
+        <div className="mb-6 flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-flame to-hot shadow-lg shadow-flame/30">
             <Dumbbell className="h-6 w-6 text-white" strokeWidth={2.5} />
           </div>
@@ -27,11 +41,31 @@ export function Layout() {
           </div>
         </div>
 
+        {/* Whose log this is */}
+        <div className="mb-8 rounded-2xl border border-ink-600/70 bg-ink-800/60 p-3">
+          <div className="flex items-center gap-3">
+            <Avatar person={person} size="sm" />
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-sm font-bold leading-tight">{person.name}</div>
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-chalk-faint">
+                Training log
+              </div>
+            </div>
+          </div>
+          <Link
+            to="/"
+            className="mt-3 flex items-center justify-center gap-1.5 rounded-xl bg-ink-700/60 px-3 py-2 text-[11px] font-bold text-chalk-muted transition-colors hover:bg-ink-600/60 hover:text-chalk"
+          >
+            <Users className="h-3.5 w-3.5" strokeWidth={2.5} />
+            Switch person
+          </Link>
+        </div>
+
         <nav className="flex flex-col gap-1">
-          {NAV.map(({ to, label, icon: Icon, end }) => (
+          {NAV.map(({ sub, label, icon: Icon, end }) => (
             <NavLink
-              key={to}
-              to={to}
+              key={sub}
+              to={href(sub)}
               end={end}
               className={({ isActive }) =>
                 cn(
@@ -55,7 +89,7 @@ export function Layout() {
         <div className="mt-auto pt-8 text-[11px] leading-relaxed text-chalk-faint">
           All weights in kilograms.
           <br />
-          Data lives on this device.
+          Each person&apos;s log is kept separate on this device.
         </div>
       </aside>
 
@@ -66,12 +100,19 @@ export function Layout() {
             <Dumbbell className="h-5 w-5 text-white" strokeWidth={2.5} />
           </div>
           <span className="text-lg font-black tracking-tight">IronLog</span>
-          <span className="ml-auto text-[11px] font-semibold uppercase tracking-widest text-chalk-faint">
-            kg
-          </span>
+
+          <Link
+            to="/"
+            aria-label={`Signed in as ${person.name}. Switch person.`}
+            className="ml-auto flex items-center gap-2 rounded-full border border-ink-600/70 bg-ink-800/70 py-1 pl-1 pr-3 transition-colors active:bg-ink-700"
+          >
+            <Avatar person={person} size="sm" className="h-7 w-7 text-[10px]" />
+            <span className="text-xs font-bold">{person.name}</span>
+            <Users className="h-3.5 w-3.5 text-chalk-faint" strokeWidth={2.5} />
+          </Link>
         </header>
 
-        <StorageWarning />
+        <StorageWarning className="mx-4 mt-3 lg:mx-10" />
 
         <main className="flex-1 px-4 pb-28 pt-4 lg:px-10 lg:pb-12 lg:pt-8">
           <div className="mx-auto w-full max-w-5xl">
@@ -82,10 +123,10 @@ export function Layout() {
         {/* Mobile bottom tabs */}
         <nav className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t border-ink-600/60 bg-ink-950/92 pt-1.5 backdrop-blur-lg lg:hidden">
           <div className="flex items-stretch justify-around">
-            {NAV.map(({ to, label, icon: Icon, end }) => (
+            {NAV.map(({ sub, label, icon: Icon, end }) => (
               <NavLink
-                key={to}
-                to={to}
+                key={sub}
+                to={href(sub)}
                 end={end}
                 className={({ isActive }) =>
                   cn(
@@ -105,17 +146,6 @@ export function Layout() {
           </div>
         </nav>
       </div>
-    </div>
-  )
-}
-
-/** Only shows when localStorage is blocked and data is memory-only. */
-function StorageWarning() {
-  if (!isEphemeral()) return null
-  return (
-    <div className="mx-4 mt-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-xs font-medium text-amber-200 lg:mx-10">
-      This browser is blocking local storage, so anything you log will be lost when you close the tab.
-      Export a backup from History if you need to keep it.
     </div>
   )
 }

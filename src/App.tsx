@@ -1,5 +1,6 @@
-import { Route, Routes } from 'react-router-dom'
-import { Layout } from './components/Layout'
+import { Navigate, Route, Routes } from 'react-router-dom'
+import { PersonScope } from './components/PersonScope'
+import { People } from './pages/People'
 import { Dashboard } from './pages/Dashboard'
 import { LogWorkout } from './pages/LogWorkout'
 import { Routines } from './pages/Routines'
@@ -10,7 +11,10 @@ import { HistoryPage } from './pages/History'
 export default function App() {
   return (
     <Routes>
-      <Route element={<Layout />}>
+      {/* Picking a person is the front door - every page below needs to know whose log it is. */}
+      <Route path="/" element={<People />} />
+
+      <Route path="/p/:personId" element={<PersonScope />}>
         <Route index element={<Dashboard />} />
         <Route path="log" element={<LogWorkout />} />
         <Route path="routines" element={<Routines />} />
@@ -19,6 +23,8 @@ export default function App() {
         <Route path="history" element={<HistoryPage />} />
         <Route path="*" element={<Dashboard />} />
       </Route>
+
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }

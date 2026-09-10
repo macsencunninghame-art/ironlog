@@ -5,6 +5,7 @@ import type { DayId, LoggedExercise, Workout } from '@/types'
 import { ROUTINE, getDay, type RoutineSlot } from '@/lib/routine'
 import { checkPR, getPR, workoutVolume } from '@/lib/stats'
 import { getWorkouts, saveWorkout } from '@/lib/workouts'
+import { usePerson } from '@/components/PersonScope'
 import { cn, fmtVolume, toDateInputValue, fromDateInputValue, uid } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
@@ -13,6 +14,7 @@ import { ExerciseLogger } from '@/components/ExerciseLogger'
 
 export function LogWorkout() {
   const navigate = useNavigate()
+  const { href } = usePerson()
   const [params, setParams] = useSearchParams()
 
   const paramDay = Number(params.get('day'))
@@ -83,7 +85,7 @@ export function LogWorkout() {
 
     saveWorkout({ ...draft, exercises })
     setSaved(true)
-    setTimeout(() => navigate('/history'), 900)
+    setTimeout(() => navigate(href('/history')), 900)
   }
 
   return (

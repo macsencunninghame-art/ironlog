@@ -44,6 +44,8 @@ export interface IronLogBackup {
   app: 'ironlog'
   version: 1
   exportedAt: string
+  /** Whose log this is. Optional so backups taken before the roster existed still import. */
+  person?: string
   workouts: Workout[]
   maxes: MaxEntry[]
 }
