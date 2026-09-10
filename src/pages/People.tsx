@@ -5,6 +5,8 @@ import { getWorkoutsFor } from '@/lib/workouts'
 import { Card } from '@/components/ui/Card'
 import { Avatar } from '@/components/Avatar'
 import { StorageWarning } from '@/components/StorageWarning'
+import { CompareChart } from '@/components/CompareChart'
+import { LatestPhotos } from '@/components/LatestPhotos'
 import { relativeDay } from '@/lib/utils'
 
 /**
@@ -41,6 +43,11 @@ export function People() {
           <PersonCard key={person.id} person={person} />
         ))}
       </div>
+
+        <div className="mt-8 space-y-3">
+          <CompareChart />
+          <LatestPhotos />
+        </div>
 
         <p className="mt-auto pt-10 text-[11px] leading-relaxed text-chalk-faint">
           Each person&apos;s workouts and tested maxes are stored separately in this browser, and

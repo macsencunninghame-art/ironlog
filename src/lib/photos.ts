@@ -149,6 +149,31 @@ export async function listPhotos(personId: string): Promise<Photo[]> {
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 }
 
+/**
+ * Everyone's most recent photo, keyed by person.
+ *
+ * One pass over the store rather than a listPhotos() call per person, since the
+ * picker needs all of them at once.
+ */
+export async function latestPhotoByPerson(): Promise<Map<string, Photo>> {
+  let rows: Photo[]
+  try {
+    rows = await withStore('readonly', (store) => store.getAll() as IDBRequest<Photo[]>)
+  } catch {
+    dbFailed = true
+    rows = [...memory.values()]
+  }
+
+  const latest = new Map<string, Photo>()
+  for (const photo of rows) {
+    const held = latest.get(photo.personId)
+    if (!held || new Date(photo.date).getTime() > new Date(held.date).getTime()) {
+      latest.set(photo.personId, photo)
+    }
+  }
+  return latest
+}
+
 export async function deletePhoto(id: string): Promise<void> {
   try {
     await withStore('readwrite', (store) => store.delete(id) as IDBRequest<undefined>)

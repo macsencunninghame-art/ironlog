@@ -7,7 +7,8 @@ browser.
 ## What it does
 
 - **Home** — pick who is lifting. Everyone gets their own routine and log; the card shows their
-  session count and when they last trained.
+  session count and when they last trained. Below the roster, **Who's improving** charts everyone's
+  progression side by side, and **Latest photos** shows the most recent shot from each person.
 - **Dashboard** — suggests your next day, tracks the week's goal of one session per routine day, shows streak,
   volume, sessions and PRs, plus a progression chart and recent activity.
 - **Log Workout** — pick Day 1/2/3, tick warmups, log weight × reps per set. PRs flash lime
@@ -70,6 +71,11 @@ against their own starting point:
   people can be compared without training a single lift in common. `EXERCISE_GROUPS` maps lifts to
   patterns; anything unmapped is left out rather than guessed at.
 - A lift needs two logged sessions before it counts. Drop sets are excluded, as they are from PRs.
+
+The same figures appear in two places: the full breakdown under **Progress → Compare everyone**,
+and a compact chart on the home picker. Bars there are coloured per person and share one scale
+across all three groups, so a bar twice as long really is twice the improvement — each row is
+labelled with the person's initials too, so it reads without matching colours to the legend.
 
 ## How things are counted
 
