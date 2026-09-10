@@ -6,10 +6,9 @@ browser.
 
 ## What it does
 
-- **Home** — pick who is lifting. Everyone gets their own routine and log; the card shows their
-  session count and when they last trained. Below the roster, **Who's improving** charts everyone's
-  progression side by side, and **Latest photos** shows the most recent shot from each person, with
-  a camera on every tile.
+- **Home** — three tabs, each sized to be taken in at a glance: **Train** (the roster, with each
+  person's session count and when they last trained), **Photos** (everyone's most recent shot, with
+  a camera on every tile) and **Progress** (**Who's improving**, charting everyone side by side).
 - **Dashboard** — suggests your next day, tracks the week's goal of one session per routine day, shows streak,
   volume, sessions and PRs, plus a progression chart and recent activity.
 - **Log Workout** — pick Day 1/2/3, tick warmups, log weight × reps per set. PRs flash lime

@@ -16,7 +16,13 @@ import { cn } from '@/lib/utils'
  * invitation to take the first one, and a roster with gaps in it reads as a
  * roster rather than as a bug.
  */
-export function LatestPhotos({ className }: { className?: string }) {
+interface LatestPhotosProps {
+  className?: string
+  /** Drop the surrounding card and heading, for a page that already provides them. */
+  bare?: boolean
+}
+
+export function LatestPhotos({ className, bare = false }: LatestPhotosProps) {
   const [latest, setLatest] = useState<Map<string, Photo>>(new Map())
   const [shooting, setShooting] = useState<Person | null>(null)
   const [saving, setSaving] = useState<string | null>(null)
@@ -50,16 +56,20 @@ export function LatestPhotos({ className }: { className?: string }) {
     }
   }
 
-  return (
-    <Card className={cn('p-5', className)}>
-      <h2 className="text-sm font-bold">Latest photos</h2>
-      <p className="mt-0.5 text-[11px] font-semibold text-chalk-faint">
-        The most recent shot from each person — tap the camera to add one
-      </p>
+  const body = (
+    <>
+      {!bare && (
+        <>
+          <h2 className="text-sm font-bold">Latest photos</h2>
+          <p className="mt-0.5 text-[11px] font-semibold text-chalk-faint">
+            The most recent shot from each person — tap the camera to add one
+          </p>
+        </>
+      )}
 
       <div
-        className="mt-4 grid gap-3"
-        style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))' }}
+        className={cn('grid gap-3', !bare && 'mt-4')}
+        style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))' }}
       >
         {PEOPLE.map((person) => (
           <PhotoTile
@@ -91,8 +101,10 @@ export function LatestPhotos({ className }: { className?: string }) {
           onClose={() => setShooting(null)}
         />
       )}
-    </Card>
+    </>
   )
+
+  return bare ? <div className={className}>{body}</div> : <Card className={cn('p-5', className)}>{body}</Card>
 }
 
 function PhotoTile({

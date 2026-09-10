@@ -24,7 +24,7 @@ import { Input } from '@/components/ui/Input'
 import { Segmented } from '@/components/ui/Segmented'
 import { LineChart } from '@/components/charts/LineChart'
 import { Avatar } from '@/components/Avatar'
-import { cn } from '@/lib/utils'
+import { cn, fmtSignedPct } from '@/lib/utils'
 
 type View = 'bronco' | 'runs' | 'compare'
 
@@ -154,7 +154,7 @@ function BroncoView({
         <MiniStat label="Latest" value={stats.latest ? fmtTime(stats.latest.seconds) : '—'} />
         <MiniStat
           label="Faster by"
-          value={stats.improvedPct === null ? '—' : `${stats.improvedPct >= 0 ? '' : '−'}${Math.abs(stats.improvedPct).toFixed(1)}%`}
+          value={stats.improvedPct === null ? '—' : fmtSignedPct(stats.improvedPct)}
           tone={stats.improvedPct !== null && stats.improvedPct > 0 ? 'volt' : undefined}
         />
       </div>
@@ -421,9 +421,7 @@ function RunningCompare({ currentPersonId }: { currentPersonId: string }) {
                             v.pct === null ? 'text-chalk-faint' : v.pct > 0 ? 'text-volt' : v.pct < 0 ? 'text-red-300' : 'text-chalk-muted',
                           )}
                         >
-                          {v.pct === null
-                            ? 'No data'
-                            : `${v.pct >= 0 ? '+' : '−'}${Math.abs(v.pct).toFixed(1)}%`}
+                          {v.pct === null ? 'No data' : fmtSignedPct(v.pct)}
                         </span>
                       </div>
                       <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-ink-700">

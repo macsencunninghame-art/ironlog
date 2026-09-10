@@ -15,6 +15,18 @@ export function fmtKg(value: number | null | undefined): string {
   return Number(value.toFixed(2)).toString()
 }
 
+/**
+ * A signed percentage: `+18%`, `+5.4%`, `−2.1%`.
+ *
+ * Rounded to one decimal BEFORE choosing the precision, so a value a hair under
+ * ten cannot render as "+10.0%" beside another that renders as "+10%".
+ */
+export function fmtSignedPct(pct: number): string {
+  const rounded = Math.round(pct * 10) / 10
+  const size = Math.abs(rounded) >= 10 ? Math.round(Math.abs(rounded)).toString() : Math.abs(rounded).toFixed(1)
+  return `${rounded < 0 ? '\u2212' : '+'}${size}%`
+}
+
 export function fmtVolume(kg: number): string {
   if (kg >= 1000) return `${Number((kg / 1000).toFixed(1))}t`
   return `${Math.round(kg)}`

@@ -1,14 +1,9 @@
-import { useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { TrendingUp } from 'lucide-react'
 import { MUSCLE_GROUPS } from '@/lib/routine'
 import { compareEveryone } from '@/lib/compare'
 import { Card } from './ui/Card'
-import { cn } from '@/lib/utils'
-
-function fmtPct(pct: number): string {
-  const rounded = Math.abs(pct) < 10 ? pct.toFixed(1) : Math.round(pct).toString()
-  return `${pct >= 0 ? '+' : '−'}${rounded.replace('-', '')}%`
-}
+import { cn, fmtSignedPct } from '@/lib/utils'
 
 /**
  * Everyone's progression side by side, by movement pattern.
@@ -18,7 +13,13 @@ function fmtPct(pct: number): string {
  * between them. Length is magnitude; the sign lives in the label, because
  * recolouring a bar red would collide with the colour that identifies the person.
  */
-export function CompareChart({ className }: { className?: string }) {
+interface CompareChartProps {
+  className?: string
+  /** Drop the surrounding card and heading, for a page that already provides them. */
+  bare?: boolean
+}
+
+export function CompareChart({ className, bare = false }: CompareChartProps) {
   const everyone = useMemo(() => compareEveryone(), [])
   const withData = everyone.filter((p) => p.overallPct !== null)
 
@@ -31,27 +32,31 @@ export function CompareChart({ className }: { className?: string }) {
     [everyone],
   )
 
+  const Frame = bare ? BareFrame : CardFrame
+
   return (
-    <Card className={cn('p-5', className)}>
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h2 className="text-sm font-bold">Who&apos;s improving</h2>
-          <p className="mt-0.5 text-[11px] font-semibold text-chalk-faint">
-            Change against each person&apos;s own starting numbers
-          </p>
+    <Frame className={className}>
+      {!bare && (
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-bold">Who&apos;s improving</h2>
+            <p className="mt-0.5 text-[11px] font-semibold text-chalk-faint">
+              Change against each person&apos;s own starting numbers
+            </p>
+          </div>
+          <TrendingUp className="h-4 w-4 shrink-0 text-chalk-faint" />
         </div>
-        <TrendingUp className="h-4 w-4 shrink-0 text-chalk-faint" />
-      </div>
+      )}
 
       {withData.length === 0 ? (
-        <p className="mt-4 text-xs leading-relaxed text-chalk-muted">
+        <p className={cn('text-xs leading-relaxed text-chalk-muted', !bare && 'mt-4')}>
           Nothing to compare yet — a lift needs two logged sessions before it shows any
           progression.
         </p>
       ) : (
         <>
           {/* Legend, since the bars are identified by colour alone. */}
-          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+          <div className={cn('flex flex-wrap gap-x-4 gap-y-1', bare ? 'mb-1' : 'mt-3')}>
             {withData.map(({ person, overallPct }) => (
               <div key={person.id} className="flex items-center gap-1.5">
                 <span
@@ -60,13 +65,13 @@ export function CompareChart({ className }: { className?: string }) {
                 />
                 <span className="text-[11px] font-bold text-chalk-muted">{person.name}</span>
                 <span className="num text-[11px] font-black text-chalk">
-                  {fmtPct(overallPct!)}
+                  {fmtSignedPct(overallPct!)}
                 </span>
               </div>
             ))}
           </div>
 
-          <div className="mt-4 space-y-4">
+          <div className={cn('space-y-4', bare ? 'mt-3' : 'mt-4')}>
             {MUSCLE_GROUPS.map(({ id, name }) => {
               const rows = withData
                 .map((p) => ({ person: p.person, group: p.groups.find((g) => g.group === id)! }))
@@ -109,7 +114,7 @@ export function CompareChart({ className }: { className?: string }) {
                                 pct < 0 ? 'text-red-300' : 'text-chalk',
                               )}
                             >
-                              {fmtPct(pct)}
+                              {fmtSignedPct(pct)}
                             </span>
                           </div>
                         )
@@ -122,6 +127,14 @@ export function CompareChart({ className }: { className?: string }) {
           </div>
         </>
       )}
-    </Card>
+    </Frame>
   )
+}
+
+function CardFrame({ className, children }: { className?: string; children: React.ReactNode }) {
+  return <Card className={cn('p-5', className)}>{children}</Card>
+}
+
+function BareFrame({ className, children }: { className?: string; children: React.ReactNode }) {
+  return <div className={className}>{children}</div>
 }

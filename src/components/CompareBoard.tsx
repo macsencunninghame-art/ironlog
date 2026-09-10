@@ -4,13 +4,7 @@ import { MUSCLE_GROUPS } from '@/lib/routine'
 import { compareEveryone, type PersonProgress } from '@/lib/compare'
 import { Card } from './ui/Card'
 import { Avatar } from './Avatar'
-import { cn } from '@/lib/utils'
-
-/** Signed percentage, always with its sign so a gain never reads as a plain number. */
-function fmtPct(pct: number): string {
-  const rounded = Math.abs(pct) < 10 ? pct.toFixed(1) : Math.round(pct).toString()
-  return `${pct >= 0 ? '+' : ''}${rounded}%`
-}
+import { cn, fmtSignedPct } from '@/lib/utils'
 
 function toneFor(pct: number | null): string {
   if (pct === null) return 'text-chalk-faint'
@@ -90,7 +84,7 @@ export function CompareBoard({ currentPersonId }: { currentPersonId: string }) {
                             {progress.person.name}
                           </span>
                           <span className={cn('num text-xs font-black', toneFor(group.changePct))}>
-                            {group.changePct === null ? 'No data' : fmtPct(group.changePct)}
+                            {group.changePct === null ? 'No data' : fmtSignedPct(group.changePct)}
                           </span>
                         </div>
                         <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-ink-700">
@@ -142,7 +136,7 @@ function PersonRow({ row, current }: { row: PersonProgress; current: boolean }) 
         </div>
       </div>
       <span className={cn('num shrink-0 text-lg font-black', toneFor(row.overallPct))}>
-        {row.overallPct === null ? '—' : fmtPct(row.overallPct)}
+        {row.overallPct === null ? '—' : fmtSignedPct(row.overallPct)}
       </span>
     </div>
   )
