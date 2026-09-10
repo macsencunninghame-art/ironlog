@@ -1,7 +1,8 @@
 import type { BroncoEntry, MaxEntry, RunEntry, Workout } from '@/types'
 import { PEOPLE } from './people'
 import { readJSON, storageKey, writeJSON, type DataKind } from './storage'
-import { getSupabase, isShared } from './supabase'
+import { getSupabase, isShared, PHOTO_BUCKET } from './supabase'
+import { allLocalPhotos, putLocalPhoto, PHOTO_WRITTEN, type Photo } from './photos'
 
 /**
  * Keeping four phones in agreement.
@@ -192,6 +193,10 @@ async function run(): Promise<SyncResult> {
       }
     }
 
+    const photos = await syncPhotos()
+    pulled += photos.pulled
+    pushed += photos.pushed
+
     lastResult = { ok: true, pulled, pushed }
   } catch (err) {
     lastResult = {
@@ -203,6 +208,78 @@ async function run(): Promise<SyncResult> {
   }
 
   return lastResult
+}
+
+/**
+ * Photos, which are blobs rather than JSON and so need their own path.
+ *
+ * The image goes to Storage and a row describing it goes to the table; the row
+ * is written second, so a half-finished upload leaves an orphaned file rather
+ * than a row pointing at an image that is not there. Downloads run one at a
+ * time: a phone catching up on a month of everyone's photos should trickle in
+ * the background, not saturate the connection.
+ */
+async function syncPhotos(): Promise<{ pulled: number; pushed: number }> {
+  const supabase = await getSupabase()
+  if (!supabase) return { pulled: 0, pushed: 0 }
+
+  const { data, error } = await supabase.from('photos').select('*')
+  if (error) throw new Error(`photos: ${error.message}`)
+
+  const local = await allLocalPhotos()
+  const localIds = new Set(local.map((p) => p.id))
+  const remoteRows = (data ?? []) as Record<string, unknown>[]
+  const remoteIds = new Set(remoteRows.map((r) => r.id as string))
+
+  let pulled = 0
+  let pushed = 0
+
+  for (const row of remoteRows) {
+    const id = row.id as string
+    if (localIds.has(id)) continue
+
+    const { data: blob, error: downloadError } = await supabase.storage
+      .from(PHOTO_BUCKET)
+      .download(row.path as string)
+    // One unreadable photo should not stop the rest of the sync.
+    if (downloadError || !blob) continue
+
+    const photo: Photo = {
+      id,
+      personId: row.person_id as string,
+      workoutId: (row.workout_id as string | null) ?? null,
+      dayId: row.day_id === null || row.day_id === undefined ? null : Number(row.day_id),
+      date: new Date(row.date as string).toISOString(),
+      blob,
+    }
+    await putLocalPhoto(photo)
+    pulled += 1
+  }
+
+  for (const photo of local) {
+    if (remoteIds.has(photo.id)) continue
+
+    const path = `${photo.personId}/${photo.id}.jpg`
+    const { error: uploadError } = await supabase.storage
+      .from(PHOTO_BUCKET)
+      .upload(path, photo.blob, { contentType: photo.blob.type || 'image/jpeg', upsert: true })
+    if (uploadError) continue
+
+    const { error: rowError } = await supabase.from('photos').upsert(
+      {
+        id: photo.id,
+        person_id: photo.personId,
+        workout_id: photo.workoutId,
+        day_id: photo.dayId,
+        date: photo.date,
+        path,
+      },
+      { onConflict: 'id' },
+    )
+    if (!rowError) pushed += 1
+  }
+
+  return { pulled, pushed }
 }
 
 let soon: ReturnType<typeof setTimeout> | null = null
@@ -237,4 +314,5 @@ export function startSync(): void {
 
   window.addEventListener('focus', () => void syncNow())
   window.addEventListener('online', () => void syncNow())
+  window.addEventListener(PHOTO_WRITTEN, () => syncSoon())
 }

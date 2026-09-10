@@ -13,6 +13,9 @@ import { uid } from './utils'
  * would balloon it. Save anything you cannot lose from the gallery.
  */
 
+/** Fired after a photo is stored, so the sync layer can upload it promptly. */
+export const PHOTO_WRITTEN = 'ironlog:photo-written'
+
 const DB_NAME = 'ironlog-photos'
 const DB_VERSION = 1
 const STORE = 'photos'
@@ -132,6 +135,12 @@ export async function addPhoto(
     dbFailed = true
     memory.set(photo.id, photo)
   }
+
+  // An event rather than a call into the sync layer: sync reads photos, so
+  // importing it back would make the two modules mutually dependent, and a
+  // cycle that works only because both sides happen to be called late is the
+  // kind of thing that breaks under a different bundler.
+  window.dispatchEvent(new Event(PHOTO_WRITTEN))
   return photo
 }
 
@@ -192,6 +201,32 @@ export async function deletePhoto(id: string): Promise<void> {
     dbFailed = true
   }
   memory.delete(id)
+}
+
+/** Every photo on this device, whoever it belongs to. Used by the sync layer. */
+export async function allLocalPhotos(): Promise<Photo[]> {
+  try {
+    return await withStore('readonly', (store) => store.getAll() as IDBRequest<Photo[]>)
+  } catch {
+    dbFailed = true
+    return [...memory.values()]
+  }
+}
+
+/**
+ * Store a photo that came from another device.
+ *
+ * Separate from addPhoto because there is nothing to compress or re-encode - the
+ * blob was already shrunk by whoever took it, and running it through the canvas
+ * again would only lose quality.
+ */
+export async function putLocalPhoto(photo: Photo): Promise<void> {
+  try {
+    await withStore('readwrite', (store) => store.put(photo) as IDBRequest<IDBValidKey>)
+  } catch {
+    dbFailed = true
+    memory.set(photo.id, photo)
+  }
 }
 
 /** How much room the photos take, for the note in the gallery. */
