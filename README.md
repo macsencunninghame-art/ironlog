@@ -195,7 +195,16 @@ photo is larger than an entire training history and a handful would blow the ~5 
 quota and take the workouts down with it. Each one is resized to 1280px and re-encoded as JPEG on
 the way in, which turns a 4 MB phone shot into roughly 150–300 KB.
 
-Nothing is sent anywhere. That means:
+Nothing is sent anywhere — the app makes no network calls at all. That means:
+
+- **Sharing the URL does not share data.** Anyone who opens the link gets their own empty copy of
+  the app, with its own storage. They will not see your sessions or photos, and nothing they log
+  will reach you. This is the whole design, not a fault — but it does surprise people, so the app
+  now says so on the home screen and in the gallery rather than leaving them to guess.
+- To genuinely share between people or devices, IronLog would need a backend it does not currently
+  have. Until then, moving a log means exporting it from History and importing it on the other
+  device; photos are not part of that export.
+
 
 - Clearing your browsing data **erases your training log**.
 - The log does not sync between your phone and your laptop — they each keep their own.

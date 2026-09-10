@@ -88,13 +88,24 @@ export function People() {
               ))}
             </div>
           )}
-          {tab === 'photos' && <LatestPhotos bare />}
+          {tab === 'photos' && (
+            <>
+              <LatestPhotos bare />
+              <p className="mt-4 rounded-2xl border border-ink-600/60 bg-ink-800/40 px-4 py-3 text-[11px] leading-relaxed text-chalk-muted">
+                These photos are saved on this device only. Anyone else opening the link sees an
+                empty gallery — not because the photos are missing, but because nothing here is
+                uploaded anywhere.
+              </p>
+            </>
+          )}
           {tab === 'progress' && <CompareChart bare />}
         </div>
 
         <p className="mt-auto pt-10 text-[11px] leading-relaxed text-chalk-faint">
-          Every person&apos;s log, photos and tested maxes are stored separately in this browser,
-          and never leave the device. Back them up from History, one person at a time.
+          Logs, photos and maxes are stored on <strong className="text-chalk-muted">this device
+          only</strong> and are never uploaded. Sending someone the link gives them their own empty
+          copy — they will not see anything logged here, and nothing they log will appear here.
+          Back a person up from History to move their log to another device.
         </p>
       </div>
     </div>
