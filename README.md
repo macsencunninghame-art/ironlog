@@ -32,6 +32,7 @@ The roster is hardcoded in `src/lib/people.ts`, the same way the routines are.
 | Macsy | Orange | The 3-day full body split |
 | Mitchy | Lime | The same split, started ~25% lighter |
 | Mezza | Pink | The same split, started ~45% lighter |
+| McGinley | Violet | The same split, started ~15% lighter |
 
 Everyone currently trains the same days, from different starting loads — a convenience while the
 app fills out, not an assumption. `scaledFullBody3(factor)` builds the split at someone's own

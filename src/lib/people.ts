@@ -76,6 +76,22 @@ export const PEOPLE: Person[] = [
     },
     routine: scaledFullBody3(0.55),
   },
+  {
+    id: 'mcginley',
+    name: 'McGinley',
+    initials: 'Mc',
+    theme: {
+      // Violet into blue: the one direction none of the other three occupy, and
+      // dark enough at both ends of the gradient to carry white text.
+      accent: '#8B5CF6',
+      accentSoft: '#A78BFA',
+      accentDeep: '#6D28D9',
+      accent2: '#3B82F6',
+      fg: '#FFFFFF',
+    },
+    // Placeholder starting loads - nothing is known about his numbers yet.
+    routine: scaledFullBody3(0.85),
+  },
 ]
 
 /**
