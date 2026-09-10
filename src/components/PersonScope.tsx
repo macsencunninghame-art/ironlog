@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo } from 'react'
+import React, { createContext, useContext, useEffect, useMemo } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 import { findPerson, personPath, themeVars, type Person } from '@/lib/people'
 import type { RoutineDay } from '@/lib/routine'
@@ -42,6 +42,21 @@ export function PersonScope() {
   // Deliberately during render, not in an effect: children render immediately after
   // this and read from storage as they go, so the switch has to have happened first.
   if (person) setActivePerson(person.id)
+
+  // The wrapper below carries the theme for the page itself, but modals are
+  // portalled into <body> to escape backdrop-filter ancestors, which puts them
+  // outside that wrapper. Mirroring the variables onto the root element keeps
+  // those in this person's colours too. Cleanup falls back to the :root defaults.
+  const theme = person?.theme
+  useEffect(() => {
+    if (!theme) return
+    const root = document.documentElement
+    const vars = themeVars(theme)
+    for (const [name, value] of Object.entries(vars)) root.style.setProperty(name, value)
+    return () => {
+      for (const name of Object.keys(vars)) root.style.removeProperty(name)
+    }
+  }, [theme])
 
   if (!person || !value) return <Navigate to="/" replace />
 

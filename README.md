@@ -8,7 +8,8 @@ browser.
 
 - **Home** — pick who is lifting. Everyone gets their own routine and log; the card shows their
   session count and when they last trained. Below the roster, **Who's improving** charts everyone's
-  progression side by side, and **Latest photos** shows the most recent shot from each person.
+  progression side by side, and **Latest photos** shows the most recent shot from each person, with
+  a camera on every tile.
 - **Dashboard** — suggests your next day, tracks the week's goal of one session per routine day, shows streak,
   volume, sessions and PRs, plus a progression chart and recent activity.
 - **Log Workout** — pick Day 1/2/3, tick warmups, log weight × reps per set. PRs flash lime
@@ -155,6 +156,11 @@ Use **Export** on the History page now and again and keep the JSON file somewher
 Backups are per person: the file is named after whoever is logged in and stamped with their
 name, and **Import** replaces the log of whoever you are currently in - it will tell you if the
 file came from someone else.
+
+Photos can be taken in the app or uploaded, from the home screen, the Log page or the gallery.
+The camera is a live preview through `getUserMedia` rather than an `<input capture>` handoff, so
+it works on a laptop as well as a phone, and falls back to the file picker where a camera is
+missing or blocked. It needs a secure origin — fine on the deployed site and on localhost.
 
 **Photos are not included in the backup.** Putting them in would balloon the JSON from kilobytes
 to megabytes. Save any photo you would hate to lose from the gallery — each one has a Save button.

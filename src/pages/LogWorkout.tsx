@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { CalendarDays, Camera, Check, Save, Trophy, X } from 'lucide-react'
+import { CalendarDays, Camera, Check, ImagePlus, Save, Trophy, X } from 'lucide-react'
 import type { DayId, LoggedExercise, Workout } from '@/types'
 import { getDay, type RoutineSlot } from '@/lib/routine'
 import { checkPR, getPR, workoutVolume } from '@/lib/stats'
@@ -9,6 +9,7 @@ import { usePerson } from '@/components/PersonScope'
 import { NoRoutine } from '@/components/NoRoutine'
 import { addPhoto } from '@/lib/photos'
 import { useObjectUrl } from '@/lib/hooks'
+import { CameraCapture } from '@/components/CameraCapture'
 import { cn, fmtVolume, toDateInputValue, fromDateInputValue, uid } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
@@ -34,6 +35,7 @@ export function LogWorkout() {
   const [savingPhotos, setSavingPhotos] = useState(false)
   const [photoError, setPhotoError] = useState(0)
   const photoRef = useRef<HTMLInputElement>(null)
+  const [shooting, setShooting] = useState(false)
 
   // Snapshot of history taken once - PRs must not shift as the form is typed into.
   const history = useMemo(() => getWorkouts(), [])
@@ -213,10 +215,16 @@ export function LogWorkout() {
                 : 'Optional. Saved with the session and shown in your gallery.'}
             </p>
           </div>
-          <Button variant="secondary" size="sm" onClick={() => photoRef.current?.click()}>
-            <Camera className="h-4 w-4" />
-            Add photo
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="secondary" size="sm" onClick={() => setShooting(true)}>
+              <Camera className="h-4 w-4" />
+              Take photo
+            </Button>
+            <Button variant="secondary" size="sm" onClick={() => photoRef.current?.click()}>
+              <ImagePlus className="h-4 w-4" />
+              Upload
+            </Button>
+          </div>
           <input
             ref={photoRef}
             id="session-photo"
@@ -253,6 +261,17 @@ export function LogWorkout() {
           </div>
         )}
       </Card>
+
+      {shooting && (
+        <CameraCapture
+          title={`Photo for ${person.name}`}
+          onCapture={(file) => {
+            setShooting(false)
+            setPhotos((prev) => [...prev, file])
+          }}
+          onClose={() => setShooting(false)}
+        />
+      )}
 
       {/* Sticky save bar */}
       <div className="sticky bottom-24 z-10 lg:bottom-4">

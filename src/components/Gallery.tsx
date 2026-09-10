@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
-import { Camera, Download, ImageOff, Trash2, X } from 'lucide-react'
+import { createPortal } from 'react-dom'
+import { Camera, Download, ImageOff, ImagePlus, Trash2, X } from 'lucide-react'
 import { addPhoto, deletePhoto, fmtBytes, listPhotos, photosAreEphemeral, totalBytes, type Photo } from '@/lib/photos'
 import { dayLabel, type RoutineDay } from '@/lib/routine'
 import { fmtDateLong, relativeDay } from '@/lib/utils'
 import { useObjectUrl } from '@/lib/hooks'
 import { Button } from './ui/Button'
 import { Card } from './ui/Card'
+import { CameraCapture } from './CameraCapture'
 
 interface GalleryProps {
   personId: string
@@ -17,6 +19,7 @@ export function Gallery({ personId, personName, routine }: GalleryProps) {
   const [photos, setPhotos] = useState<Photo[] | null>(null)
   const [busy, setBusy] = useState(false)
   const [open, setOpen] = useState<Photo | null>(null)
+  const [shooting, setShooting] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -37,6 +40,14 @@ export function Gallery({ personId, personName, routine }: GalleryProps) {
     setPhotos(await listPhotos(personId))
     setBusy(false)
     if (fileRef.current) fileRef.current.value = ''
+  }
+
+  const handleShot = async (file: File) => {
+    setShooting(false)
+    setBusy(true)
+    await addPhoto(personId, file)
+    setPhotos(await listPhotos(personId))
+    setBusy(false)
   }
 
   const handleDelete = async (id: string) => {
@@ -61,10 +72,16 @@ export function Gallery({ personId, personName, routine }: GalleryProps) {
                 : 'Nothing yet'}
             </p>
           </div>
-          <Button size="sm" onClick={() => fileRef.current?.click()} disabled={busy}>
-            <Camera className="h-4 w-4" />
-            {busy ? 'Adding…' : 'Add photo'}
-          </Button>
+          <div className="flex gap-2">
+            <Button size="sm" onClick={() => setShooting(true)} disabled={busy}>
+              <Camera className="h-4 w-4" />
+              {busy ? 'Adding…' : 'Take photo'}
+            </Button>
+            <Button variant="secondary" size="sm" onClick={() => fileRef.current?.click()} disabled={busy}>
+              <ImagePlus className="h-4 w-4" />
+              Upload
+            </Button>
+          </div>
           <input
             ref={fileRef}
             id="gallery-file"
@@ -106,6 +123,14 @@ export function Gallery({ personId, personName, routine }: GalleryProps) {
             <Thumb key={photo.id} photo={photo} routine={routine} onOpen={() => setOpen(photo)} />
           ))}
         </div>
+      )}
+
+      {shooting && (
+        <CameraCapture
+          title={`Photo for ${personName}`}
+          onCapture={handleShot}
+          onClose={() => setShooting(false)}
+        />
       )}
 
       {open && (
@@ -178,7 +203,9 @@ function Lightbox({
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
-  return (
+  // Portalled for the same reason as the camera sheet: a filtered ancestor would
+  // otherwise become the containing block and trap this inline.
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
@@ -240,6 +267,7 @@ function Lightbox({
           </Button>
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
