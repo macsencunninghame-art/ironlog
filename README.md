@@ -208,19 +208,41 @@ photo is larger than an entire training history and a handful would blow the ~5 
 quota and take the workouts down with it. Each one is resized to 1280px and re-encoded as JPEG on
 the way in, which turns a 4 MB phone shot into roughly 150–300 KB.
 
-Nothing is sent anywhere — the app makes no network calls at all. That means:
+## Sharing between devices
 
-- **Sharing the URL does not share data.** Anyone who opens the link gets their own empty copy of
-  the app, with its own storage. They will not see your sessions or photos, and nothing they log
-  will reach you. This is the whole design, not a fault — but it does surprise people, so the app
-  now says so on the home screen and in the gallery rather than leaving them to guess.
-- To genuinely share between people or devices, IronLog would need a backend it does not currently
-  have. Until then, moving a log means exporting it from History and importing it on the other
-  device; photos are not part of that export.
+With `VITE_SUPABASE_URL` and `VITE_SUPABASE_KEY` set, the log is also **shared**: every device
+keeps its own full copy and syncs with the others in the background. Without those two variables
+the app behaves exactly as it always did — everything on the device, nothing uploaded, no network
+calls at all. A missing or wrong key degrades to local-only rather than a broken app.
 
+Sync leans on one property: nothing can be edited or deleted, so the data is append-only. Two
+devices that have drifted apart have not disagreed about anything — they have each seen entries
+the other has not — so merging is a union by id. No conflicts, no last-write-wins, and no way for
+a sync to lose an entry. That is also why every read stayed synchronous and instant, and why the
+app still works with no signal: a session logged in a basement uploads itself when the signal
+returns.
 
-- Clearing your browsing data **erases your training log**.
-- The log does not sync between your phone and your laptop — they each keep their own.
+It runs at boot, when the app is brought back to the front, when the connection returns, and
+shortly after a write. Nothing is force-refreshed underneath you — pages re-read when they mount,
+so a background pull is picked up by the next navigation rather than making a half-typed session
+disappear.
+
+Photos sync too: the image goes to Supabase Storage and a row describing it to the table. The row
+is written second, so an interrupted upload leaves an orphaned file rather than a row pointing at
+an image that is not there.
+
+Setting it up is `supabase/schema.sql` run once in the Supabase SQL editor, then the two variables
+in the host's environment. Access is currently open — anyone with the site can read and write —
+but RLS is on with permissive policies, so adding logins later is a policy change rather than a
+rewrite. No policy grants `DELETE` to anyone.
+
+## Your data
+
+Still on the device first, and still yours:
+
+- Clearing your browsing data **erases this device's copy**. If it has synced, the shared database
+  still has it and the next sync brings it back; if it never synced, it is gone.
+- Without the shared database configured, nothing leaves the device at all.
 
 Use **Export** on the History page now and again and keep the JSON file somewhere safe.
 Backups are per person: the file is named after whoever is logged in and stamped with their
