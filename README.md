@@ -125,6 +125,19 @@ Linking it would need a small serverless function on Vercel to hold the secret a
 exchange, a registered Strava API application, and a stored refresh token per person. `RunEntry`
 already carries a `source` field so imported activities can be told apart from hand-entered ones.
 
+## Nothing can be deleted
+
+There is no delete button anywhere in the app — not for a session, a photo, a tested max, a Bronco
+or a run. A mis-tap on a phone should never be able to cost someone months of training, and with a
+log that lives only on one device there is no second copy to fall back on.
+
+The `delete*` functions still exist in `src/lib/`, deliberately unwired. They are the code-level
+escape hatch for an entry that genuinely has to go — callable from the browser console.
+
+The route that needs no console: **Export** from History, edit the JSON by hand, **Import** it
+back. Import is the one destructive action left in the app, and it replaces that person's whole
+log, so it asks first.
+
 ## How things are counted
 
 | Rule | Behaviour |

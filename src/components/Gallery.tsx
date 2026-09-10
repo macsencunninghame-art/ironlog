@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Camera, Download, ImageOff, ImagePlus, Trash2, X } from 'lucide-react'
-import { addPhoto, deletePhoto, fmtBytes, listPhotos, photosAreEphemeral, totalBytes, type Photo } from '@/lib/photos'
+import { Camera, Download, ImageOff, ImagePlus, X } from 'lucide-react'
+import { addPhoto, fmtBytes, listPhotos, photosAreEphemeral, totalBytes, type Photo } from '@/lib/photos'
 import { dayLabel, type RoutineDay } from '@/lib/routine'
 import { fmtDateLong, relativeDay } from '@/lib/utils'
 import { useObjectUrl } from '@/lib/hooks'
@@ -50,11 +50,6 @@ export function Gallery({ personId, personName, routine }: GalleryProps) {
     setBusy(false)
   }
 
-  const handleDelete = async (id: string) => {
-    await deletePhoto(id)
-    setPhotos(await listPhotos(personId))
-    setOpen(null)
-  }
 
   if (photos === null) {
     return <p className="px-1 py-8 text-center text-xs font-semibold text-chalk-faint">Loading photos…</p>
@@ -136,12 +131,7 @@ export function Gallery({ personId, personName, routine }: GalleryProps) {
       )}
 
       {open && (
-        <Lightbox
-          photo={open}
-          routine={routine}
-          onClose={() => setOpen(null)}
-          onDelete={() => handleDelete(open.id)}
-        />
+        <Lightbox photo={open} routine={routine} onClose={() => setOpen(null)} />
       )}
     </div>
   )
@@ -189,15 +179,12 @@ function Lightbox({
   photo,
   routine,
   onClose,
-  onDelete,
 }: {
   photo: Photo
   routine: RoutineDay[]
   onClose: () => void
-  onDelete: () => void
 }) {
   const url = useObjectUrl(photo.blob)
-  const [confirming, setConfirming] = useState(false)
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
@@ -253,21 +240,6 @@ function Lightbox({
           <Download className="h-4 w-4" />
           Save
         </a>
-        {confirming ? (
-          <>
-            <Button size="sm" variant="danger" onClick={onDelete}>
-              Delete for good
-            </Button>
-            <Button size="sm" variant="ghost" onClick={() => setConfirming(false)}>
-              Cancel
-            </Button>
-          </>
-        ) : (
-          <Button size="sm" variant="danger" onClick={() => setConfirming(true)}>
-            <Trash2 className="h-4 w-4" />
-            Delete
-          </Button>
-        )}
       </div>
     </div>,
     document.body,

@@ -74,6 +74,17 @@ export function addBronco(seconds: number, date: Date, note?: string): BroncoEnt
   return entry
 }
 
+/**
+ * Deliberately not wired to any button.
+ *
+ * Nothing can be deleted from inside the app: a mis-tap should never be able to
+ * cost someone months of training. This stays exported as the code-level escape
+ * hatch - callable from the browser console, or from a one-off script - for the
+ * rare entry that genuinely has to go.
+ *
+ * The route that needs no console at all is Export from History, editing the
+ * JSON by hand, and Importing it back.
+ */
 export function deleteBronco(id: string): void {
   writeJSON(
     activeKey('broncos'),
@@ -109,6 +120,17 @@ export function addRun(
   return entry
 }
 
+/**
+ * Deliberately not wired to any button.
+ *
+ * Nothing can be deleted from inside the app: a mis-tap should never be able to
+ * cost someone months of training. This stays exported as the code-level escape
+ * hatch - callable from the browser console, or from a one-off script - for the
+ * rare entry that genuinely has to go.
+ *
+ * The route that needs no console at all is Export from History, editing the
+ * JSON by hand, and Importing it back.
+ */
 export function deleteRun(id: string): void {
   writeJSON(
     activeKey('runs'),

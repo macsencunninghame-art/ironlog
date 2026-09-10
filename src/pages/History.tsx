@@ -6,7 +6,7 @@ import { dayIds } from '@/lib/routine'
 import { usePerson } from '@/components/PersonScope'
 import { Gallery } from '@/components/Gallery'
 import { Segmented } from '@/components/ui/Segmented'
-import { deleteWorkout, downloadBackup, getWorkouts, restoreBackup } from '@/lib/workouts'
+import { downloadBackup, getWorkouts, restoreBackup } from '@/lib/workouts'
 import { workoutVolume } from '@/lib/stats'
 import { cn, fmtVolume } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
@@ -28,10 +28,6 @@ export function HistoryPage() {
   const visible = filter === 'all' ? workouts : workouts.filter((w) => w.dayId === filter)
   const totalVolume = workouts.reduce((n, w) => n + workoutVolume(w), 0)
 
-  const handleDelete = (id: string) => {
-    deleteWorkout(id)
-    setVersion((v) => v + 1)
-  }
 
   const handleFile = async (file: File) => {
     const raw = await file.text()
@@ -90,7 +86,7 @@ export function HistoryPage() {
       {visible.length ? (
         <div className="space-y-3">
           {visible.map((workout) => (
-            <SessionCard key={workout.id} workout={workout} onDelete={handleDelete} />
+            <SessionCard key={workout.id} workout={workout} />
           ))}
         </div>
       ) : (
@@ -109,7 +105,8 @@ export function HistoryPage() {
         <h2 className="text-sm font-bold">Backup</h2>
         <p className="mt-1 text-[11px] leading-relaxed text-chalk-muted">
           Everything lives in this browser only. Clearing your browsing data wipes it. Export a copy
-          now and again, and keep it somewhere safe.
+          now and again, and keep it somewhere safe. Nothing can be deleted from inside the app —
+          importing is the one exception, and it replaces this person&apos;s whole log.
         </p>
 
         <div className="mt-4 flex flex-wrap gap-2">

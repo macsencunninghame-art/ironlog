@@ -41,6 +41,17 @@ export function saveWorkout(workout: Workout): void {
   writeJSON(activeKey('workouts'), next)
 }
 
+/**
+ * Deliberately not wired to any button.
+ *
+ * Nothing can be deleted from inside the app: a mis-tap should never be able to
+ * cost someone months of training. This stays exported as the code-level escape
+ * hatch - callable from the browser console, or from a one-off script - for the
+ * rare entry that genuinely has to go.
+ *
+ * The route that needs no console at all is Export from History, editing the
+ * JSON by hand, and Importing it back.
+ */
 export function deleteWorkout(id: string): void {
   const all = readJSON<Workout[]>(activeKey('workouts'), [])
   if (!Array.isArray(all)) return

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronDown, Dumbbell, Layers, Trash2 } from 'lucide-react'
+import { ChevronDown, Dumbbell, Layers } from 'lucide-react'
 import type { Workout } from '@/types'
 import { EXERCISE_NAMES, dayLabel } from '@/lib/routine'
 import { usePerson } from './PersonScope'
@@ -10,12 +10,10 @@ import { Card } from './ui/Card'
 
 interface SessionCardProps {
   workout: Workout
-  onDelete: (id: string) => void
 }
 
-export function SessionCard({ workout, onDelete }: SessionCardProps) {
+export function SessionCard({ workout }: SessionCardProps) {
   const [open, setOpen] = useState(false)
-  const [confirming, setConfirming] = useState(false)
 
   const { routine } = usePerson()
 
@@ -105,36 +103,6 @@ export function SessionCard({ workout, onDelete }: SessionCardProps) {
             })}
           </div>
 
-          <div className="mt-4 flex justify-end">
-            {confirming ? (
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-chalk-muted">Delete this session?</span>
-                <button
-                  type="button"
-                  onClick={() => setConfirming(false)}
-                  className="rounded-lg px-3 py-1.5 text-xs font-bold text-chalk-muted hover:bg-ink-700"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onDelete(workout.id)}
-                  className="rounded-lg bg-red-500/20 px-3 py-1.5 text-xs font-bold text-red-300 hover:bg-red-500/30"
-                >
-                  Delete
-                </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setConfirming(true)}
-                className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold text-chalk-faint transition-colors hover:bg-red-500/10 hover:text-red-300"
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-                Delete
-              </button>
-            )}
-          </div>
         </div>
       )}
     </Card>

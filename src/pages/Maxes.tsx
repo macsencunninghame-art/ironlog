@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
-import { ChevronDown, Plus, Trash2, Trophy, TrendingUp } from 'lucide-react'
-import { MAX_LIFTS, addMax, bestMax, currentMax, deleteMax, historyFor, maxDelta } from '@/lib/maxes'
+import { ChevronDown, Plus, Trophy, TrendingUp } from 'lucide-react'
+import { MAX_LIFTS, addMax, bestMax, currentMax, historyFor, maxDelta } from '@/lib/maxes'
 import { cn, fmtDateLong, fmtKg, fmtShortDate, toDateInputValue, fromDateInputValue } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
@@ -189,17 +189,6 @@ function MaxCard({ liftId, name, note, open, onToggle, onChanged }: MaxCardProps
                   <span className="text-[11px] font-semibold text-chalk-faint">
                     {fmtDateLong(entry.date)}
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      deleteMax(entry.id)
-                      onChanged()
-                    }}
-                    aria-label="Delete this entry"
-                    className="ml-auto flex h-7 w-7 items-center justify-center rounded-lg text-chalk-faint transition-colors hover:bg-red-500/10 hover:text-red-300"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
                 </div>
               ))}
             </div>

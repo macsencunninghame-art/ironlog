@@ -1,12 +1,10 @@
 import { useMemo, useState } from 'react'
-import { Footprints, Gauge, Timer, Trash2, TrendingDown } from 'lucide-react'
+import { Footprints, Gauge, Timer, TrendingDown } from 'lucide-react'
 import type { BroncoEntry, RunEntry } from '@/types'
 import {
   addBronco,
   addRun,
   broncoStats,
-  deleteBronco,
-  deleteRun,
   fmtPace,
   fmtTime,
   getBroncos,
@@ -182,10 +180,6 @@ function BroncoView({
           best: stats.best?.id === e.id,
         }))}
         emptyText="Nothing logged yet."
-        onDelete={(id) => {
-          deleteBronco(id)
-          onChange()
-        }}
       />
     </div>
   )
@@ -328,10 +322,6 @@ function RunsView({
           secondary: `${fmtPace(paceOf(r))} · ${fmtDate(r.date)}`,
         }))}
         emptyText="Nothing logged yet."
-        onDelete={(id) => {
-          deleteRun(id)
-          onChange()
-        }}
       />
     </div>
   )
@@ -462,14 +452,10 @@ function MiniStat({ label, value, tone }: { label: string; value: string; tone?:
 function EntryList({
   rows,
   emptyText,
-  onDelete,
 }: {
   rows: { id: string; primary: string; secondary: string; best?: boolean }[]
   emptyText: string
-  onDelete: (id: string) => void
 }) {
-  const [confirming, setConfirming] = useState<string | null>(null)
-
   if (!rows.length) return <EmptyBlock text={emptyText} />
 
   return (
@@ -487,25 +473,6 @@ function EntryList({
             </div>
             <div className="text-[11px] font-semibold text-chalk-faint">{row.secondary}</div>
           </div>
-          {confirming === row.id ? (
-            <div className="flex gap-1.5">
-              <Button size="sm" variant="danger" onClick={() => onDelete(row.id)}>
-                Delete
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => setConfirming(null)}>
-                Cancel
-              </Button>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setConfirming(row.id)}
-              aria-label={`Delete ${row.primary}`}
-              className="rounded-xl p-2 text-chalk-faint hover:text-red-300"
-            >
-              <Trash2 className="h-4 w-4" />
-            </button>
-          )}
         </div>
       ))}
     </Card>
