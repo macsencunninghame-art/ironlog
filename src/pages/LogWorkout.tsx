@@ -2,10 +2,11 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { CalendarDays, Check, Save, Trophy } from 'lucide-react'
 import type { DayId, LoggedExercise, Workout } from '@/types'
-import { ROUTINE, getDay, type RoutineSlot } from '@/lib/routine'
+import { getDay, type RoutineSlot } from '@/lib/routine'
 import { checkPR, getPR, workoutVolume } from '@/lib/stats'
 import { getWorkouts, saveWorkout } from '@/lib/workouts'
 import { usePerson } from '@/components/PersonScope'
+import { NoRoutine } from '@/components/NoRoutine'
 import { cn, fmtVolume, toDateInputValue, fromDateInputValue, uid } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
@@ -14,11 +15,13 @@ import { ExerciseLogger } from '@/components/ExerciseLogger'
 
 export function LogWorkout() {
   const navigate = useNavigate()
-  const { href } = usePerson()
+  const { person, routine, href } = usePerson()
   const [params, setParams] = useSearchParams()
 
+  // The valid days are whatever this person's routine defines, so the ?day= param
+  // is checked against that rather than against a fixed 1-3.
   const paramDay = Number(params.get('day'))
-  const initialDay: DayId = paramDay === 1 || paramDay === 2 || paramDay === 3 ? paramDay : 1
+  const initialDay: DayId = routine.some((d) => d.id === paramDay) ? paramDay : (routine[0]?.id ?? 0)
 
   const [dayId, setDayId] = useState<DayId>(initialDay)
   const [date, setDate] = useState(() => toDateInputValue(new Date()))
@@ -27,10 +30,11 @@ export function LogWorkout() {
 
   // Snapshot of history taken once - PRs must not shift as the form is typed into.
   const history = useMemo(() => getWorkouts(), [])
-  const day = getDay(dayId)
+  const day = getDay(routine, dayId)
 
   const prs = useMemo(() => {
     const map = new Map<string, ReturnType<typeof getPR>>()
+    if (!day) return map
     for (const slot of day.slots) {
       if (!map.has(slot.exerciseId)) map.set(slot.exerciseId, getPR(history, slot.exerciseId))
     }
@@ -39,6 +43,7 @@ export function LogWorkout() {
 
   // Rebuild the blank form whenever the day changes.
   useEffect(() => {
+    if (!day) return
     setEntries(day.slots.map((slot) => blankEntry(slot, history)))
     setSaved(false)
   }, [day, history])
@@ -53,7 +58,7 @@ export function LogWorkout() {
   const prCount = useMemo(() => {
     let count = 0
     entries.forEach((entry, i) => {
-      const slot = day.slots[i]
+      const slot = day?.slots[i]
       if (!slot) return
       const pr = prs.get(slot.exerciseId) ?? null
       for (const set of entry.sets) {
@@ -88,6 +93,19 @@ export function LogWorkout() {
     setTimeout(() => navigate(href('/history')), 900)
   }
 
+  // After the hooks, so their order never changes between renders.
+  if (!day) {
+    return (
+      <div className="space-y-5">
+        <div>
+          <h1 className="text-2xl font-black tracking-tight">Log workout</h1>
+          <p className="mt-0.5 text-sm text-chalk-muted">Weights in kilograms.</p>
+        </div>
+        <NoRoutine name={person.name} action="log" />
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-5 pb-4">
       <div>
@@ -96,8 +114,11 @@ export function LogWorkout() {
       </div>
 
       {/* Day picker */}
-      <div className="grid grid-cols-3 gap-2">
-        {ROUTINE.map((d) => (
+      <div
+        className="grid gap-2"
+        style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(96px, 1fr))' }}
+      >
+        {routine.map((d) => (
           <button
             key={d.id}
             type="button"

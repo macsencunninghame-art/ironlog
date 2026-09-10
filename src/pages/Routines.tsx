@@ -1,16 +1,32 @@
 import { Flame, Link2, Lock, TrendingDown } from 'lucide-react'
-import { ROUTINE } from '@/lib/routine'
+import { usePerson } from '@/components/PersonScope'
+import { NoRoutine } from '@/components/NoRoutine'
 import { fmtKg } from '@/lib/utils'
 import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 
 export function Routines() {
+  const { person, routine } = usePerson()
+
+  if (!routine.length) {
+    return (
+      <div className="space-y-5">
+        <div>
+          <h1 className="text-2xl font-black tracking-tight">The routine</h1>
+          <p className="mt-0.5 text-sm text-chalk-muted">{person.name}&apos;s training days.</p>
+        </div>
+        <NoRoutine name={person.name} action="show" />
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-5">
       <div>
         <h1 className="text-2xl font-black tracking-tight">The routine</h1>
         <p className="mt-0.5 text-sm text-chalk-muted">
-          Three full body days. All weights in kilograms.
+          {routine.length} day{routine.length === 1 ? '' : 's'} for {person.name}. All weights in
+          kilograms.
         </p>
       </div>
 
@@ -21,7 +37,7 @@ export function Routines() {
         </p>
       </div>
 
-      {ROUTINE.map((day) => (
+      {routine.map((day) => (
         <Card key={day.id} className="overflow-hidden">
           <div className="flex items-center gap-3 border-b border-ink-600/60 bg-gradient-to-r from-flame/12 to-transparent p-4">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-flame to-hot text-base font-black text-white shadow-lg shadow-flame/20">

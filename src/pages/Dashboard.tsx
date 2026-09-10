@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Activity, ArrowRight, Dumbbell, Flame, Play, Trophy, TrendingUp } from 'lucide-react'
-import { EXERCISE_NAMES, getDay } from '@/lib/routine'
+import { EXERCISE_NAMES, dayLabel, getDay } from '@/lib/routine'
 import {
   currentStreak,
   daysDoneThisWeek,
@@ -14,6 +14,7 @@ import {
 } from '@/lib/stats'
 import { getWorkouts } from '@/lib/workouts'
 import { usePerson } from '@/components/PersonScope'
+import { NoRoutine } from '@/components/NoRoutine'
 import { fmtKg, fmtVolume, relativeDay } from '@/lib/utils'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -23,11 +24,11 @@ import { LineChart } from '@/components/charts/LineChart'
 
 export function Dashboard() {
   const navigate = useNavigate()
-  const { person, href } = usePerson()
+  const { person, routine, href } = usePerson()
   const workouts = useMemo(() => getWorkouts(), [])
 
   const suggested = suggestNextDay(workouts)
-  const suggestedDay = getDay(suggested)
+  const suggestedDay = suggested === null ? undefined : getDay(routine, suggested)
   const done = daysDoneThisWeek(workouts)
   const streak = currentStreak(workouts)
   const weekVolume = volumeThisWeek(workouts)
@@ -67,6 +68,20 @@ export function Dashboard() {
 
   const recent = workouts.slice(0, 4)
 
+  // Everything below the hero is built out of training days, so with none there is
+  // nothing honest to show - not a dashboard of zeroes.
+  if (!suggestedDay) {
+    return (
+      <div className="space-y-5">
+        <div>
+          <h1 className="text-2xl font-black tracking-tight">Welcome, {person.name}</h1>
+          <p className="mt-0.5 text-sm text-chalk-muted">IronLog · all weights in kilograms.</p>
+        </div>
+        <NoRoutine name={person.name} action="train yet" />
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-5">
       {/* Hero */}
@@ -101,9 +116,15 @@ export function Dashboard() {
       <div>
         <div className="mb-2 flex items-baseline justify-between">
           <h2 className="text-xs font-bold uppercase tracking-widest text-chalk-muted">This week</h2>
-          <span className="num text-xs font-bold text-chalk-faint">{done.size} of 3</span>
+          <span className="num text-xs font-bold text-chalk-faint">
+            {done.size} of {routine.length}
+          </span>
         </div>
-        <WeekTracker done={done} onPick={(day) => navigate(href(`/log?day=${day}`))} />
+        <WeekTracker
+          routine={routine}
+          done={done}
+          onPick={(day) => navigate(href(`/log?day=${day}`))}
+        />
       </div>
 
       {/* Stats */}
@@ -182,7 +203,7 @@ export function Dashboard() {
         {recent.length ? (
           <div className="space-y-2">
             {recent.map((workout) => {
-              const day = getDay(workout.dayId)
+              const day = dayLabel(routine, workout.dayId)
               return (
                 <Link
                   key={workout.id}
@@ -193,7 +214,7 @@ export function Dashboard() {
                     {workout.dayId}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-xs font-bold">{day.name}</div>
+                    <div className="truncate text-xs font-bold">{day}</div>
                     <div className="text-[11px] font-semibold text-chalk-faint">
                       {relativeDay(workout.date)}
                     </div>

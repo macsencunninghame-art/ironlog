@@ -25,7 +25,7 @@ const NAV = [
 ]
 
 export function Layout() {
-  const { person, href } = usePerson()
+  const { person, routine, href } = usePerson()
 
   return (
     <div className="min-h-full lg:flex">
@@ -37,7 +37,7 @@ export function Layout() {
           </div>
           <div>
             <div className="text-xl font-black tracking-tight leading-none">IronLog</div>
-            <div className="text-[11px] font-medium text-chalk-faint">3-day full body</div>
+            <div className="text-[11px] font-medium text-chalk-faint">Training log</div>
           </div>
         </div>
 
@@ -48,7 +48,7 @@ export function Layout() {
             <div className="min-w-0 flex-1">
               <div className="truncate text-sm font-bold leading-tight">{person.name}</div>
               <div className="text-[10px] font-semibold uppercase tracking-widest text-chalk-faint">
-                Training log
+                {routine.length ? `${routine.length}-day routine` : 'No routine yet'}
               </div>
             </div>
           </div>
@@ -89,7 +89,7 @@ export function Layout() {
         <div className="mt-auto pt-8 text-[11px] leading-relaxed text-chalk-faint">
           All weights in kilograms.
           <br />
-          Each person&apos;s log is kept separate on this device.
+          Each person&apos;s routine and log are their own.
         </div>
       </aside>
 

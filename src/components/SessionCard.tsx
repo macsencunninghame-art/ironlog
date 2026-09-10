@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { ChevronDown, Dumbbell, Layers, Trash2 } from 'lucide-react'
 import type { Workout } from '@/types'
-import { EXERCISE_NAMES, getDay } from '@/lib/routine'
+import { EXERCISE_NAMES, dayLabel } from '@/lib/routine'
+import { usePerson } from './PersonScope'
 import { completedSetCount, workoutVolume } from '@/lib/stats'
 import { cn, fmtDateLong, fmtKg, fmtVolume, relativeDay } from '@/lib/utils'
 import { Badge } from './ui/Badge'
@@ -16,7 +17,9 @@ export function SessionCard({ workout, onDelete }: SessionCardProps) {
   const [open, setOpen] = useState(false)
   const [confirming, setConfirming] = useState(false)
 
-  const day = getDay(workout.dayId)
+  const { routine } = usePerson()
+
+  const day = dayLabel(routine, workout.dayId)
   const volume = workoutVolume(workout)
   const sets = completedSetCount(workout)
 
@@ -34,7 +37,7 @@ export function SessionCard({ workout, onDelete }: SessionCardProps) {
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="truncate text-sm font-bold">{day.name}</span>
+            <span className="truncate text-sm font-bold">{day}</span>
             <Badge tone="muted">{relativeDay(workout.date)}</Badge>
           </div>
           <div className="num mt-1 flex items-center gap-3 text-[11px] font-semibold text-chalk-muted">

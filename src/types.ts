@@ -1,4 +1,11 @@
-export type DayId = 1 | 2 | 3
+/**
+ * Which day of a person's routine a session belongs to.
+ *
+ * Was `1 | 2 | 3` when everyone shared one three-day split. Routines are now
+ * per person and can be any length, so the valid ids are whatever that person's
+ * routine defines - see `dayIds()`.
+ */
+export type DayId = number
 
 /** A single logged working set. */
 export interface SetEntry {

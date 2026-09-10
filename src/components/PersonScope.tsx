@@ -1,11 +1,14 @@
 import { createContext, useContext, useMemo } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 import { findPerson, personPath, type Person } from '@/lib/people'
+import type { RoutineDay } from '@/lib/routine'
 import { setActivePerson } from '@/lib/storage'
 import { Layout } from './Layout'
 
 interface PersonScopeValue {
   person: Person
+  /** This person's days. Empty when their routine has not been written yet. */
+  routine: RoutineDay[]
   /** Absolute path to a page inside this person's section, e.g. href('/log?day=2'). */
   href: (sub?: string) => string
 }
@@ -29,7 +32,10 @@ export function PersonScope() {
   const person = findPerson(personId)
 
   const value = useMemo(
-    () => (person ? { person, href: (sub = '') => personPath(person.id, sub) } : null),
+    () =>
+      person
+        ? { person, routine: person.routine, href: (sub = '') => personPath(person.id, sub) }
+        : null,
     [person],
   )
 

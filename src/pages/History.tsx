@@ -2,7 +2,8 @@ import { useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { AlertTriangle, Download, History as HistoryIcon, Upload } from 'lucide-react'
 import type { DayId } from '@/types'
-import { DAY_IDS } from '@/lib/routine'
+import { dayIds } from '@/lib/routine'
+import { usePerson } from '@/components/PersonScope'
 import { deleteWorkout, downloadBackup, getWorkouts, restoreBackup } from '@/lib/workouts'
 import { workoutVolume } from '@/lib/stats'
 import { cn, fmtVolume } from '@/lib/utils'
@@ -11,6 +12,7 @@ import { Card } from '@/components/ui/Card'
 import { SessionCard } from '@/components/SessionCard'
 
 export function HistoryPage() {
+  const { routine } = usePerson()
   const [version, setVersion] = useState(0)
   const [filter, setFilter] = useState<DayId | 'all'>('all')
   const [notice, setNotice] = useState<{ ok: boolean; message: string } | null>(null)
@@ -58,7 +60,7 @@ export function HistoryPage() {
         <FilterChip active={filter === 'all'} onClick={() => setFilter('all')}>
           All
         </FilterChip>
-        {DAY_IDS.map((day) => (
+        {dayIds(routine).map((day) => (
           <FilterChip key={day} active={filter === day} onClick={() => setFilter(day)}>
             Day {day}
           </FilterChip>

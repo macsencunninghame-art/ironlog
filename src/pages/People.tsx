@@ -22,7 +22,7 @@ export function People() {
         </div>
         <div>
           <div className="text-2xl font-black leading-none tracking-tight">IronLog</div>
-          <div className="text-[11px] font-semibold text-chalk-faint">3-day full body · kilograms</div>
+          <div className="text-[11px] font-semibold text-chalk-faint">Training logs · kilograms</div>
         </div>
       </div>
 
@@ -32,7 +32,7 @@ export function People() {
         Who&apos;s <span className="text-gradient-flame">lifting</span>?
       </h1>
       <p className="mt-1.5 text-sm text-chalk-muted">
-        Everyone runs the same three days. The logs stay separate.
+        Own routine, own log, own numbers.
       </p>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -68,7 +68,11 @@ function PersonCard({ person }: { person: Person }) {
               : 'No sessions yet'}
           </div>
           <div className="mt-1 text-[11px] font-semibold text-chalk-faint">
-            {last ? `Last trained ${relativeDay(last.date).toLowerCase()}` : 'Ready to start'}
+            {last
+              ? `Last trained ${relativeDay(last.date).toLowerCase()}`
+              : person.routine.length
+                ? `${person.routine.length}-day routine · ready to start`
+                : 'No routine yet'}
           </div>
         </div>
 

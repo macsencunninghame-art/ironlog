@@ -1,9 +1,14 @@
 import type { DayId } from '@/types'
 
 /**
- * THE ROUTINE IS FIXED.
+ * ROUTINES ARE FIXED.
  * These constants are the app. There is deliberately no settings screen and no
  * code path that writes to any of this - it can only change by editing this file.
+ *
+ * A routine is not global any more: each person in `people.ts` is assigned one,
+ * and a person with no routine yet simply has an empty list of days. Every helper
+ * here takes the routine it should work on rather than reaching for a single
+ * shared one, so nobody's days can leak into someone else's screen.
  */
 
 export interface RoutineSlot {
@@ -54,7 +59,8 @@ export const EXERCISE_NAMES: Record<string, string> = {
   'one-legged-rdls': 'One-legged RDLs',
 }
 
-export const ROUTINE: RoutineDay[] = [
+/** Macsy's three-day full body split. */
+export const FULL_BODY_3: RoutineDay[] = [
   {
     id: 1,
     name: 'Full Body A',
@@ -312,18 +318,32 @@ export const ROUTINE: RoutineDay[] = [
   },
 ]
 
-export const DAY_IDS: DayId[] = [1, 2, 3]
+/** The day numbers this routine defines, in order. */
+export function dayIds(routine: RoutineDay[]): DayId[] {
+  return routine.map((d) => d.id)
+}
 
-export function getDay(dayId: DayId): RoutineDay {
-  const day = ROUTINE.find((d) => d.id === dayId)
-  if (!day) throw new Error(`Unknown day ${dayId}`)
-  return day
+/**
+ * A day within a routine, or undefined when the routine does not define it.
+ *
+ * Deliberately not throwing: a person's routine can be edited after they have
+ * already logged sessions against it, and old history should still render.
+ */
+export function getDay(routine: RoutineDay[], dayId: DayId): RoutineDay | undefined {
+  return routine.find((d) => d.id === dayId)
+}
+
+/** What to call a day, falling back to its number for history under an edited routine. */
+export function dayLabel(routine: RoutineDay[], dayId: DayId): string {
+  return getDay(routine, dayId)?.name ?? `Day ${dayId}`
 }
 
 /** Every distinct tracked exercise, in the order it first appears in the week. */
-export function allTrackedExercises(): { id: string; name: string; bodyweight: boolean }[] {
+export function allTrackedExercises(
+  routine: RoutineDay[],
+): { id: string; name: string; bodyweight: boolean }[] {
   const seen = new Map<string, { id: string; name: string; bodyweight: boolean }>()
-  for (const day of ROUTINE) {
+  for (const day of routine) {
     for (const slot of day.slots) {
       if (!seen.has(slot.exerciseId)) {
         seen.set(slot.exerciseId, {
@@ -337,8 +357,8 @@ export function allTrackedExercises(): { id: string; name: string; bodyweight: b
   return [...seen.values()]
 }
 
-export function findSlot(exerciseId: string): RoutineSlot | undefined {
-  for (const day of ROUTINE) {
+export function findSlot(routine: RoutineDay[], exerciseId: string): RoutineSlot | undefined {
+  for (const day of routine) {
     const slot = day.slots.find((s) => s.exerciseId === exerciseId)
     if (slot) return slot
   }

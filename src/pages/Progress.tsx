@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { BarChart3, LineChart as LineIcon, Trophy } from 'lucide-react'
 import { allTrackedExercises } from '@/lib/routine'
+import { usePerson } from '@/components/PersonScope'
+import { NoRoutine } from '@/components/NoRoutine'
 import { exerciseSeries, exercisesWithData, getPR, weeklyVolume } from '@/lib/stats'
 import { getWorkouts } from '@/lib/workouts'
 import { fmtKg, fmtShortDate, fmtVolume } from '@/lib/utils'
@@ -13,11 +15,13 @@ import { BarChart } from '@/components/charts/BarChart'
 type Metric = 'weight' | 'e1rm'
 
 export function Progress() {
+  const { person, routine } = usePerson()
   const workouts = useMemo(() => getWorkouts(), [])
   const withData = useMemo(() => exercisesWithData(workouts), [workouts])
-  const exercises = allTrackedExercises()
+  const exercises = allTrackedExercises(routine)
 
-  const firstWithData = exercises.find((e) => withData.has(e.id))?.id ?? exercises[0].id
+  // Hooks must run before any early return, so this tolerates an empty routine.
+  const firstWithData = exercises.find((e) => withData.has(e.id))?.id ?? exercises[0]?.id ?? ''
   const [exerciseId, setExerciseId] = useState(firstWithData)
   const [metric, setMetric] = useState<Metric>('weight')
 
@@ -42,6 +46,19 @@ export function Progress() {
     detail: `${w.sessions} session${w.sessions === 1 ? '' : 's'}`,
   }))
   const hasVolume = weeks.some((w) => w.volume > 0)
+
+  // After the hooks above, so the hook order stays identical either way.
+  if (!routine.length) {
+    return (
+      <div className="space-y-5">
+        <div>
+          <h1 className="text-2xl font-black tracking-tight">Progress</h1>
+          <p className="mt-0.5 text-sm text-chalk-muted">Every number here is one you lifted.</p>
+        </div>
+        <NoRoutine name={person.name} action="chart" />
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-5">

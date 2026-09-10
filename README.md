@@ -1,14 +1,14 @@
 # IronLog
 
-A gym tracker for one fixed 3-day full body split, shared by a few people on the same
-device. Mobile-first, all weights in kilograms, no backend, no accounts. Everything lives in
-your browser.
+A gym tracker for a few people on the same device, each with their own routine and their own
+log. Mobile-first, all weights in kilograms, no backend, no accounts. Everything lives in your
+browser.
 
 ## What it does
 
-- **Home** - pick who is lifting. Everyone gets their own log; the card shows their session
-  count and when they last trained.
-- **Dashboard** — suggests your next day, tracks the week's 3-workout goal, shows streak,
+- **Home** — pick who is lifting. Everyone gets their own routine and log; the card shows their
+  session count and when they last trained.
+- **Dashboard** — suggests your next day, tracks the week's goal of one session per routine day, shows streak,
   volume, sessions and PRs, plus a progression chart and recent activity.
 - **Log Workout** — pick Day 1/2/3, tick warmups, log weight × reps per set. PRs flash lime
   as you type. Prescribed sets are pre-filled from last time; add or remove sets on the day.
@@ -19,23 +19,37 @@ your browser.
 
 ## Who uses it
 
-The roster is hardcoded in `src/lib/people.ts`, the same way the routine is. Right now that is
-**Macsy** and **Mitchy**. Everyone trains the same three days - what is separate is the log.
+The roster is hardcoded in `src/lib/people.ts`, the same way the routines are.
 
-Each person's workouts, tested maxes, PRs, streak and charts are entirely their own. Nothing
-one person logs can appear in the other's numbers. The person is part of the URL, so
-`/p/macsy/progress` and `/p/mitchy/progress` are different pages, and **Switch person** in the
-sidebar (or the name chip in the mobile header) goes back to the picker.
+| Person | Accent | Routine |
+| --- | --- | --- |
+| Macsy | Orange | The 3-day full body split |
+| Mitchy | Lime | None yet |
+| Mezza | Pink | None yet |
 
-To add someone, add an entry to `PEOPLE` with an unused accent. Avatars are drawn from each
-person's initials rather than uploaded - the app ships no image assets and stores nothing on a
-server.
+Each person's workouts, tested maxes, PRs, streak and charts are entirely their own, and so are
+the days they train. Nothing one person logs can appear in another's numbers. The person is part
+of the URL, so `/p/macsy/progress` and `/p/mezza/progress` are different pages, and **Switch
+person** in the sidebar (or the name chip in the mobile header) goes back to the picker.
 
-## The routine is fixed
+Someone whose routine has not been written yet has no training days. Rather than showing them
+someone else's split or a dashboard of zeroes, the pages that need days — Home, Log, Routine and
+Progress — say **No routine yet**. History and the 1RM Board still work, since neither depends
+on a routine.
 
-The three days, their exercises and the starting weights are hardcoded in
-`src/lib/routine.ts`. There is deliberately no settings screen — the only way to change the
-routine is to edit that file. This keeps the numbers behind your charts honest.
+To add someone, add an entry to `PEOPLE` with an unused accent and either an existing routine or
+a new one. Avatars are drawn from each person's initials rather than uploaded — the app ships no
+image assets and stores nothing on a server.
+
+## The routines are fixed
+
+Routines live in `src/lib/routine.ts` and are assigned to people in `src/lib/people.ts`. The
+days, their exercises and the starting weights are all hardcoded. There is deliberately no
+settings screen — the only way to change a routine is to edit that file. This keeps the numbers
+behind your charts honest.
+
+`FULL_BODY_3` is the 3-day full body split, currently Macsy's. A person can be given an existing
+routine or a new one; give someone `[]` and they have no training days yet.
 
 ## How things are counted
 
@@ -48,12 +62,12 @@ routine is to edit that file. This keeps the numbers behind your charts honest.
 | First entry | The first time a lift is logged it counts as a PR — nothing to beat yet. |
 | Bodyweight lifts | Reps only. Their PR is the best rep count, and they add no volume. |
 | Volume | `weight × reps` across completed working sets. |
-| Week | Monday to Sunday. Goal is all 3 days, in any order, on any days. |
-| Streak | Consecutive weeks where all 3 days were logged. |
+| Week | Monday to Sunday. Goal is every day of that person's routine, in any order. |
+| Streak | Consecutive weeks where every day of their routine was logged. |
 | Tested 1RMs | Entirely separate from training PRs. They never affect PR detection. |
 
-Weighted Pullups are tracked as two separate lifts — Volume (Day 1, higher reps) and Heavy
-(Day 3, lower reps) — so progress in both rep ranges stays meaningful. Preacher Curls, Hammer
+Within the full body split, Weighted Pullups are tracked as two separate lifts — Volume
+(Day 1, higher reps) and Heavy (Day 3, lower reps) — so progress in both rep ranges stays meaningful. Preacher Curls, Hammer
 Curls, Lateral Raises and Calf Training are shared across the days they appear on.
 
 ## Run it locally

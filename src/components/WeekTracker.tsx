@@ -1,9 +1,10 @@
 import { Check } from 'lucide-react'
 import type { DayId } from '@/types'
-import { ROUTINE } from '@/lib/routine'
+import type { RoutineDay } from '@/lib/routine'
 import { cn } from '@/lib/utils'
 
 interface WeekTrackerProps {
+  routine: RoutineDay[]
   done: Set<DayId>
   onPick?: (day: DayId) => void
 }
@@ -12,10 +13,13 @@ interface WeekTrackerProps {
  * Purely informational. There is no fixed schedule and nothing here blocks
  * a fourth or fifth session - it just shows what is left in the week.
  */
-export function WeekTracker({ done, onPick }: WeekTrackerProps) {
+export function WeekTracker({ routine, done, onPick }: WeekTrackerProps) {
   return (
-    <div className="grid grid-cols-3 gap-2">
-      {ROUTINE.map((day) => {
+    <div
+      className="grid gap-2"
+      style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(96px, 1fr))' }}
+    >
+      {routine.map((day) => {
         const complete = done.has(day.id)
         return (
           <button

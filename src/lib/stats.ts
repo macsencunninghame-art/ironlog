@@ -1,5 +1,6 @@
 import type { DayId, SetEntry, Workout } from '@/types'
-import { DAY_IDS, findSlot } from './routine'
+import { dayIds, findSlot } from './routine'
+import { activeRoutine } from './people'
 import { startOfWeek, weekKey } from './utils'
 
 /** Epley estimate. Reps of 1 return the load itself. */
@@ -32,7 +33,7 @@ function countableSets(workouts: Workout[], exerciseId: string): SetEntry[] {
 }
 
 export function isBodyweight(exerciseId: string): boolean {
-  return findSlot(exerciseId)?.bodyweight ?? false
+  return findSlot(activeRoutine(), exerciseId)?.bodyweight ?? false
 }
 
 /**
@@ -171,12 +172,14 @@ export function volumeThisWeek(workouts: Workout[]): number {
 }
 
 /**
- * Consecutive weeks where all three days were logged.
+ * Consecutive weeks where every day of the person's routine was logged.
  * The current week only counts once it is complete, so a part-finished week
  * never breaks a run that is still live.
  */
 export function currentStreak(workouts: Workout[]): number {
-  if (!workouts.length) return 0
+  const goal = activeRoutine().length
+  // Nothing to complete, so there is no such thing as a full week yet.
+  if (!goal || !workouts.length) return 0
 
   const byWeek = new Map<string, Set<DayId>>()
   for (const workout of workouts) {
@@ -185,7 +188,7 @@ export function currentStreak(workouts: Workout[]): number {
     byWeek.get(key)!.add(workout.dayId)
   }
 
-  const complete = (key: string) => (byWeek.get(key)?.size ?? 0) >= 3
+  const complete = (key: string) => (byWeek.get(key)?.size ?? 0) >= goal
 
   const cursor = startOfWeek(new Date())
   let streak = 0
@@ -215,12 +218,16 @@ function lastTrained(workouts: Workout[]): Map<DayId, number> {
 /**
  * What to train next. Prefers a day not yet done this week; otherwise whichever
  * day was trained longest ago. Never blocks a fourth or fifth session.
+ * Null when the person has no routine yet - there is nothing to suggest.
  */
-export function suggestNextDay(workouts: Workout[]): DayId {
+export function suggestNextDay(workouts: Workout[]): DayId | null {
+  const all = dayIds(activeRoutine())
+  if (!all.length) return null
+
   const done = daysDoneThisWeek(workouts)
   const last = lastTrained(workouts)
-  const outstanding = DAY_IDS.filter((d) => !done.has(d))
-  const pool = outstanding.length ? outstanding : DAY_IDS
+  const outstanding = all.filter((d) => !done.has(d))
+  const pool = outstanding.length ? outstanding : all
 
   return [...pool].sort((a, b) => {
     const aLast = last.get(a) ?? -1
