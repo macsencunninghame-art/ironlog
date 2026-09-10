@@ -201,7 +201,8 @@ launches full-screen and your data persists between sessions.
 ## Your data
 
 Each person's log is stored in this browser under `ironlog:<person>:workouts`,
-`ironlog:<person>:maxes`, `ironlog:<person>:broncos` and `ironlog:<person>:runs` — so `ironlog:macsy:workouts`, `ironlog:mitchy:maxes`, and so on.
+`ironlog:<person>:maxes`, `ironlog:<person>:broncos` and `ironlog:<person>:runs` — so
+`ironlog:macsy:workouts`, `ironlog:mitchy:maxes`, and so on.
 
 Photos are different. They live in **IndexedDB** (`ironlog-photos`), because a single compressed
 photo is larger than an entire training history and a handful would blow the ~5 MB localStorage
@@ -236,13 +237,11 @@ in the host's environment. Access is currently open — anyone with the site can
 but RLS is on with permissive policies, so adding logins later is a policy change rather than a
 rewrite. No policy grants `DELETE` to anyone.
 
-## Your data
+## Backups
 
-Still on the device first, and still yours:
-
-- Clearing your browsing data **erases this device's copy**. If it has synced, the shared database
-  still has it and the next sync brings it back; if it never synced, it is gone.
-- Without the shared database configured, nothing leaves the device at all.
+Clearing your browsing data erases this device's copy. If it has synced, the shared database still
+has it and the next sync brings it back; if it never synced, it is gone. Without the shared
+database configured, nothing leaves the device at all.
 
 Use **Export** on the History page now and again and keep the JSON file somewhere safe.
 Backups are per person: the file is named after whoever is logged in and stamped with their
