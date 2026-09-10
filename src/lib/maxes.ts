@@ -1,6 +1,7 @@
 import type { MaxEntry } from '@/types'
 import { activeKey, readJSON, writeJSON } from './storage'
 import { uid } from './utils'
+import { syncSoon } from './sync'
 
 /**
  * Tested one-rep maxes.
@@ -36,6 +37,7 @@ export function readMaxes(): MaxEntry[] {
 
 export function writeMaxes(entries: MaxEntry[]): void {
   writeJSON(activeKey('maxes'), entries)
+  syncSoon()
 }
 
 /** Full dated history for one lift, oldest first. */

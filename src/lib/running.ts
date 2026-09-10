@@ -2,6 +2,7 @@ import type { BroncoEntry, RunEntry } from '@/types'
 import { activeKey, readJSON, storageKey, writeJSON } from './storage'
 import { PEOPLE, type Person } from './people'
 import { uid } from './utils'
+import { syncSoon } from './sync'
 
 /**
  * Running: Bronco tests and logged runs.
@@ -71,6 +72,7 @@ export function getBroncosFor(personId: string): BroncoEntry[] {
 export function addBronco(seconds: number, date: Date, note?: string): BroncoEntry {
   const entry: BroncoEntry = { id: uid(), date: date.toISOString(), seconds, note }
   writeJSON(activeKey('broncos'), [...getBroncos(), entry])
+  syncSoon()
   return entry
 }
 
@@ -117,6 +119,7 @@ export function addRun(
     source: 'manual',
   }
   writeJSON(activeKey('runs'), [...getRuns(), entry])
+  syncSoon()
   return entry
 }
 

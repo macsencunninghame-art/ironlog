@@ -3,6 +3,7 @@ import { activeKey, getActivePersonId, readJSON, storageKey, writeJSON } from '.
 import { readMaxes, writeMaxes } from './maxes'
 import { findPerson } from './people'
 import { getBroncos, getRuns } from './running'
+import { syncSoon } from './sync'
 
 /**
  * Every logged session, newest first.
@@ -39,6 +40,7 @@ export function saveWorkout(workout: Workout): void {
   if (existing >= 0) next[existing] = workout
   else next.push(workout)
   writeJSON(activeKey('workouts'), next)
+  syncSoon()
 }
 
 /**

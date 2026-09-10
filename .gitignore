@@ -9,3 +9,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 *.tsbuildinfo
+
+# Local environment overrides (Supabase keys during local development)
+.env
+.env.local
