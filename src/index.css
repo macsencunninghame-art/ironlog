@@ -59,6 +59,13 @@
     padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
   }
 
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
   .glass {
     background: linear-gradient(160deg, rgba(26, 34, 51, 0.92), rgba(11, 15, 26, 0.85));
     backdrop-filter: blur(12px);

@@ -7,6 +7,7 @@ import { Routines } from './pages/Routines'
 import { Progress } from './pages/Progress'
 import { Maxes } from './pages/Maxes'
 import { Running } from './pages/Running'
+import { Hyrox, Tri } from './pages/ComingSoon'
 import { HistoryPage } from './pages/History'
 
 export default function App() {
@@ -22,6 +23,8 @@ export default function App() {
         <Route path="progress" element={<Progress />} />
         <Route path="maxes" element={<Maxes />} />
         <Route path="running" element={<Running />} />
+        <Route path="hyrox" element={<Hyrox />} />
+        <Route path="tri" element={<Tri />} />
         <Route path="history" element={<HistoryPage />} />
         <Route path="*" element={<Dashboard />} />
       </Route>

@@ -14,8 +14,9 @@ browser.
 - **Log Workout** — pick Day 1/2/3, tick warmups, log weight × reps per set. PRs flash lime
   as you type. Prescribed sets are pre-filled from last time; add or remove sets on the day.
 - **Routine** — read-only view of all three days with warmup, superset and drop-set markers.
-- **Running** — Bronco tests and logged runs, each with an improvement chart and a comparison
-  across everyone. Separate from lifting, because here lower is better.
+- **Training** — everything conditioning. **Running** (Bronco tests and logged runs, each with an
+  improvement chart and a comparison across everyone) is built; **Hyrox** and **Tri** are named
+  placeholders that say so rather than offering forms that go nowhere.
 - **Progress** — line chart per exercise (top set or estimated 1RM) and a 12-week volume bar
   chart, plus **Compare everyone**: who is actually improving, measured against their own numbers.
 - **1RM Board** — your tested one-rep maxes, entered by hand, with dated history and a chart.
@@ -79,6 +80,23 @@ The same figures appear in two places: the full breakdown under **Progress → C
 and a compact chart on the home picker. Bars there are coloured per person and share one scale
 across all three groups, so a bar twice as long really is twice the improvement — each row is
 labelled with the person's initials too, so it reads without matching colours to the legend.
+
+## Getting around
+
+Inside a person's log the bottom bar carries three tabs rather than the seven it had grown to:
+
+| Tab | Holds |
+| --- | --- |
+| Home | Their dashboard |
+| Gym | Log · Routine · Progress · Maxes · History |
+| Training | Running · Hyrox · Tri |
+
+Choosing a tab opens the section's first page and a row of pills for the rest of it, so anything
+is one tap from anywhere. The pills are sized to fit five across a 360px screen and scroll if a
+section ever grows past that. On a desktop the sidebar drops the pills and lists both groups open.
+
+Sections are defined in `src/lib/sections.ts` — adding a page is an entry in that list plus a
+route, and the navigation follows.
 
 ## Running
 
