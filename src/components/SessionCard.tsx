@@ -31,7 +31,7 @@ export function SessionCard({ workout, onDelete }: SessionCardProps) {
         className="flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-ink-700/30"
         aria-expanded={open}
       >
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-flame to-hot text-base font-black text-white shadow-lg shadow-flame/20">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-accent to-accent2 text-base font-black text-white shadow-lg shadow-accent/20">
           {workout.dayId}
         </div>
 

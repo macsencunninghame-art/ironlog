@@ -29,7 +29,7 @@ export function WeekTracker({ routine, done, onPick }: WeekTrackerProps) {
             disabled={!onPick}
             className={cn(
               'flex items-center gap-2 rounded-2xl border px-3 py-2.5 text-left transition-all',
-              onPick && 'hover:border-flame/50 active:scale-[0.98]',
+              onPick && 'hover:border-accent/50 active:scale-[0.98]',
               complete
                 ? 'border-volt/40 bg-volt/10'
                 : 'border-ink-600 bg-ink-800/60',

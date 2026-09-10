@@ -4,6 +4,8 @@ import { BarChart3, LineChart as LineIcon, Trophy } from 'lucide-react'
 import { allTrackedExercises } from '@/lib/routine'
 import { usePerson } from '@/components/PersonScope'
 import { NoRoutine } from '@/components/NoRoutine'
+import { CompareBoard } from '@/components/CompareBoard'
+import { Segmented } from '@/components/ui/Segmented'
 import { exerciseSeries, exercisesWithData, getPR, weeklyVolume } from '@/lib/stats'
 import { getWorkouts } from '@/lib/workouts'
 import { fmtKg, fmtShortDate, fmtVolume } from '@/lib/utils'
@@ -13,6 +15,7 @@ import { LineChart } from '@/components/charts/LineChart'
 import { BarChart } from '@/components/charts/BarChart'
 
 type Metric = 'weight' | 'e1rm'
+type View = 'you' | 'compare'
 
 export function Progress() {
   const { person, routine } = usePerson()
@@ -24,6 +27,7 @@ export function Progress() {
   const firstWithData = exercises.find((e) => withData.has(e.id))?.id ?? exercises[0]?.id ?? ''
   const [exerciseId, setExerciseId] = useState(firstWithData)
   const [metric, setMetric] = useState<Metric>('weight')
+  const [view, setView] = useState<View>('you')
 
   const selected = exercises.find((e) => e.id === exerciseId)
   const pr = getPR(workouts, exerciseId)
@@ -47,19 +51,6 @@ export function Progress() {
   }))
   const hasVolume = weeks.some((w) => w.volume > 0)
 
-  // After the hooks above, so the hook order stays identical either way.
-  if (!routine.length) {
-    return (
-      <div className="space-y-5">
-        <div>
-          <h1 className="text-2xl font-black tracking-tight">Progress</h1>
-          <p className="mt-0.5 text-sm text-chalk-muted">Every number here is one you lifted.</p>
-        </div>
-        <NoRoutine name={person.name} action="chart" />
-      </div>
-    )
-  }
-
   return (
     <div className="space-y-5">
       <div>
@@ -67,10 +58,25 @@ export function Progress() {
         <p className="mt-0.5 text-sm text-chalk-muted">Every number here is one you lifted.</p>
       </div>
 
+      <Segmented
+        options={[
+          { value: 'you', label: 'Your progress' },
+          { value: 'compare', label: 'Compare everyone' },
+        ]}
+        value={view}
+        onChange={setView}
+      />
+
+      {view === 'compare' ? (
+        <CompareBoard currentPersonId={person.id} />
+      ) : !routine.length ? (
+        <NoRoutine name={person.name} action="chart" />
+      ) : (
+        <>
       {/* Exercise progression */}
       <Card className="p-5">
         <div className="mb-4 flex items-center gap-2">
-          <LineIcon className="h-4 w-4 text-flame" />
+          <LineIcon className="h-4 w-4 text-accent" />
           <h2 className="text-sm font-bold">Exercise progression</h2>
         </div>
 
@@ -131,7 +137,7 @@ export function Progress() {
       {/* Weekly volume */}
       <Card className="p-5">
         <div className="mb-1 flex items-center gap-2">
-          <BarChart3 className="h-4 w-4 text-hot" />
+          <BarChart3 className="h-4 w-4 text-accent2" />
           <h2 className="text-sm font-bold">Weekly volume</h2>
         </div>
         <p className="mb-4 text-[11px] font-semibold text-chalk-faint">
@@ -160,6 +166,8 @@ export function Progress() {
           <Empty text="No volume yet. Save a session and this fills in." />
         )}
       </Card>
+        </>
+      )}
     </div>
   )
 }
@@ -179,7 +187,7 @@ function MetricTab({
       onClick={onClick}
       className={
         active
-          ? 'rounded-xl bg-flame/15 px-3 py-1.5 text-xs font-bold text-flame ring-1 ring-flame/30'
+          ? 'rounded-xl bg-accent/15 px-3 py-1.5 text-xs font-bold text-accent ring-1 ring-accent/30'
           : 'rounded-xl px-3 py-1.5 text-xs font-bold text-chalk-faint hover:text-chalk-muted'
       }
     >

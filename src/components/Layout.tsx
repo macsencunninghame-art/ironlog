@@ -32,7 +32,7 @@ export function Layout() {
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:border-r lg:border-ink-600/60 lg:bg-ink-950/40 lg:p-6">
         <div className="mb-6 flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-flame to-hot shadow-lg shadow-flame/30">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-accent to-accent2 shadow-lg shadow-accent/30">
             <Dumbbell className="h-6 w-6 text-white" strokeWidth={2.5} />
           </div>
           <div>
@@ -71,14 +71,14 @@ export function Layout() {
                 cn(
                   'flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition-all',
                   isActive
-                    ? 'bg-gradient-to-r from-flame/20 to-hot/10 text-chalk shadow-inner ring-1 ring-flame/30'
+                    ? 'bg-gradient-to-r from-accent/20 to-accent2/10 text-chalk shadow-inner ring-1 ring-accent/30'
                     : 'text-chalk-muted hover:bg-ink-700/60 hover:text-chalk',
                 )
               }
             >
               {({ isActive }) => (
                 <>
-                  <Icon className={cn('h-5 w-5', isActive && 'text-flame')} strokeWidth={2.3} />
+                  <Icon className={cn('h-5 w-5', isActive && 'text-accent')} strokeWidth={2.3} />
                   {label}
                 </>
               )}
@@ -96,7 +96,7 @@ export function Layout() {
       <div className="flex min-h-full flex-1 flex-col">
         {/* Mobile header */}
         <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-ink-600/50 bg-ink-900/85 px-4 py-3 backdrop-blur-lg lg:hidden">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-flame to-hot">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent2">
             <Dumbbell className="h-5 w-5 text-white" strokeWidth={2.5} />
           </div>
           <span className="text-lg font-black tracking-tight">IronLog</span>
@@ -131,7 +131,7 @@ export function Layout() {
                 className={({ isActive }) =>
                   cn(
                     'flex flex-1 flex-col items-center gap-1 rounded-xl px-1 py-1.5 transition-colors',
-                    isActive ? 'text-flame' : 'text-chalk-faint',
+                    isActive ? 'text-accent' : 'text-chalk-faint',
                   )
                 }
               >

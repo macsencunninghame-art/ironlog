@@ -85,17 +85,17 @@ export function Dashboard() {
   return (
     <div className="space-y-5">
       {/* Hero */}
-      <Card className="relative overflow-hidden border-flame/25 p-6">
-        <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-flame/20 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-20 -left-10 h-44 w-44 rounded-full bg-hot/15 blur-3xl" />
+      <Card className="relative overflow-hidden border-accent/25 p-6">
+        <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-accent/20 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-20 -left-10 h-44 w-44 rounded-full bg-accent2/15 blur-3xl" />
 
         <div className="relative">
-          <p className="text-[11px] font-bold uppercase tracking-widest text-flame">
+          <p className="text-[11px] font-bold uppercase tracking-widest text-accent">
             {workouts.length ? 'Up next' : `Welcome to IronLog, ${person.name}`}
           </p>
           <h1 className="mt-2 text-3xl font-black leading-tight tracking-tight sm:text-4xl">
             Day {suggestedDay.id}
-            <span className="text-gradient-flame"> {suggestedDay.name}</span>
+            <span className="text-gradient-accent"> {suggestedDay.name}</span>
           </h1>
           <p className="mt-1 text-sm font-medium text-chalk-muted">
             {suggestedDay.subtitle} · {suggestedDay.slots.length} exercises
@@ -135,7 +135,7 @@ export function Dashboard() {
           unit={streak === 1 ? 'wk' : 'wks'}
           hint="Full weeks"
           icon={Flame}
-          tone="flame"
+          tone="accent"
         />
         <StatCard
           label="Week volume"
@@ -143,7 +143,7 @@ export function Dashboard() {
           unit="kg"
           hint="Mon to Sun"
           icon={Dumbbell}
-          tone="hot"
+          tone="accent2"
         />
         <StatCard
           label="Sessions"
@@ -164,7 +164,7 @@ export function Dashboard() {
           </div>
           <Link
             to={href("/progress")}
-            className="flex shrink-0 items-center gap-1 text-xs font-bold text-flame hover:text-flame-soft"
+            className="flex shrink-0 items-center gap-1 text-xs font-bold text-accent hover:text-accent-soft"
           >
             All charts
             <ArrowRight className="h-3.5 w-3.5" />
@@ -192,7 +192,7 @@ export function Dashboard() {
           {workouts.length > 0 && (
             <Link
               to={href("/history")}
-              className="flex items-center gap-1 text-xs font-bold text-flame hover:text-flame-soft"
+              className="flex items-center gap-1 text-xs font-bold text-accent hover:text-accent-soft"
             >
               History
               <ArrowRight className="h-3.5 w-3.5" />
@@ -210,7 +210,7 @@ export function Dashboard() {
                   to={href("/history")}
                   className="flex items-center gap-3 rounded-2xl bg-ink-900/50 p-3 transition-colors hover:bg-ink-700/50"
                 >
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-flame to-hot text-sm font-black text-white">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent2 text-sm font-black text-white">
                     {workout.dayId}
                   </span>
                   <div className="min-w-0 flex-1">

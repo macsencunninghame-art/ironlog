@@ -15,9 +15,10 @@ import { relativeDay } from '@/lib/utils'
  */
 export function People() {
   return (
-    <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col px-4 py-10 lg:py-16">
+    <div className="app-glow min-h-full">
+      <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col px-4 py-10 lg:py-16">
       <div className="mb-8 flex items-center gap-3">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-flame to-hot shadow-lg shadow-flame/30">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-accent to-accent2 shadow-lg shadow-accent/30">
           <Dumbbell className="h-7 w-7 text-white" strokeWidth={2.5} />
         </div>
         <div>
@@ -29,7 +30,7 @@ export function People() {
       <StorageWarning className="mb-6" />
 
       <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
-        Who&apos;s <span className="text-gradient-flame">lifting</span>?
+        Who&apos;s <span className="text-gradient-accent">lifting</span>?
       </h1>
       <p className="mt-1.5 text-sm text-chalk-muted">
         Own routine, own log, own numbers.
@@ -41,10 +42,11 @@ export function People() {
         ))}
       </div>
 
-      <p className="mt-auto pt-10 text-[11px] leading-relaxed text-chalk-faint">
-        Each person&apos;s workouts and tested maxes are stored separately in this browser, and never
-        leave the device. Back them up from History, one person at a time.
-      </p>
+        <p className="mt-auto pt-10 text-[11px] leading-relaxed text-chalk-faint">
+          Each person&apos;s workouts and tested maxes are stored separately in this browser, and
+          never leave the device. Back them up from History, one person at a time.
+        </p>
+      </div>
     </div>
   )
 }
@@ -56,7 +58,8 @@ function PersonCard({ person }: { person: Person }) {
   return (
     <Link to={personPath(person.id)} className="group block rounded-3xl">
       <Card
-        className={`flex items-center gap-4 p-5 transition-all group-hover:-translate-y-0.5 group-hover:ring-1 ${person.ring}`}
+        className="flex items-center gap-4 p-5 transition-all group-hover:-translate-y-0.5 group-hover:ring-1"
+        style={{ ['--tw-ring-color' as string]: `${person.theme.accent}66` }}
       >
         <Avatar person={person} size="lg" />
 

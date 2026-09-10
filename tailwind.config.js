@@ -8,6 +8,16 @@ export default {
         Array.from({ length: 101 }, (_, i) => [i, (i / 100).toString()]),
       ),
       colors: {
+        // Repainted per person: PersonScope sets these variables from their theme.
+        accent: {
+          DEFAULT: 'rgb(var(--accent) / <alpha-value>)',
+          soft: 'rgb(var(--accent-soft) / <alpha-value>)',
+          deep: 'rgb(var(--accent-deep) / <alpha-value>)',
+          fg: 'rgb(var(--accent-fg) / <alpha-value>)',
+        },
+        accent2: {
+          DEFAULT: 'rgb(var(--accent-2) / <alpha-value>)',
+        },
         ink: {
           950: '#070A12',
           900: '#0B0F1A',

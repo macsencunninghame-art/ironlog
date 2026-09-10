@@ -4,6 +4,8 @@ import { AlertTriangle, Download, History as HistoryIcon, Upload } from 'lucide-
 import type { DayId } from '@/types'
 import { dayIds } from '@/lib/routine'
 import { usePerson } from '@/components/PersonScope'
+import { Gallery } from '@/components/Gallery'
+import { Segmented } from '@/components/ui/Segmented'
 import { deleteWorkout, downloadBackup, getWorkouts, restoreBackup } from '@/lib/workouts'
 import { workoutVolume } from '@/lib/stats'
 import { cn, fmtVolume } from '@/lib/utils'
@@ -11,8 +13,11 @@ import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { SessionCard } from '@/components/SessionCard'
 
+type View = 'sessions' | 'photos'
+
 export function HistoryPage() {
-  const { routine } = usePerson()
+  const { person, routine } = usePerson()
+  const [view, setView] = useState<View>('sessions')
   const [version, setVersion] = useState(0)
   const [filter, setFilter] = useState<DayId | 'all'>('all')
   const [notice, setNotice] = useState<{ ok: boolean; message: string } | null>(null)
@@ -54,6 +59,20 @@ export function HistoryPage() {
           </p>
         </div>
       </div>
+
+      <Segmented
+        options={[
+          { value: 'sessions', label: 'Sessions' },
+          { value: 'photos', label: 'Photos' },
+        ]}
+        value={view}
+        onChange={setView}
+      />
+
+      {view === 'photos' ? (
+        <Gallery personId={person.id} personName={person.name} routine={routine} />
+      ) : (
+        <>
 
       {/* Day filter */}
       <div className="flex gap-2">
@@ -149,6 +168,8 @@ export function HistoryPage() {
           </p>
         )}
       </Card>
+        </>
+      )}
     </div>
   )
 }
@@ -169,7 +190,7 @@ function FilterChip({
       className={cn(
         'rounded-xl px-3.5 py-2 text-xs font-bold transition-all active:scale-95',
         active
-          ? 'bg-gradient-to-r from-flame to-hot text-white shadow-lg shadow-flame/20'
+          ? 'bg-gradient-to-r from-accent to-accent2 text-white shadow-lg shadow-accent/20'
           : 'border border-ink-600 bg-ink-800/60 text-chalk-muted hover:text-chalk',
       )}
     >

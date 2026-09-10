@@ -39,8 +39,8 @@ export function Routines() {
 
       {routine.map((day) => (
         <Card key={day.id} className="overflow-hidden">
-          <div className="flex items-center gap-3 border-b border-ink-600/60 bg-gradient-to-r from-flame/12 to-transparent p-4">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-flame to-hot text-base font-black text-white shadow-lg shadow-flame/20">
+          <div className="flex items-center gap-3 border-b border-ink-600/60 bg-gradient-to-r from-accent/12 to-transparent p-4">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-accent to-accent2 text-base font-black text-white shadow-lg shadow-accent/20">
               {day.id}
             </div>
             <div className="min-w-0">
@@ -62,7 +62,7 @@ export function Routines() {
                   <h3 className="text-sm font-bold leading-snug">{slot.name}</h3>
 
                   <div className="num mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-semibold text-chalk-muted">
-                    <span className="text-flame-soft">
+                    <span className="text-accent-soft">
                       {slot.sets} x {slot.reps}
                     </span>
                     {slot.startWeight !== null ? (

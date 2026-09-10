@@ -1,12 +1,14 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { CalendarDays, Check, Save, Trophy } from 'lucide-react'
+import { CalendarDays, Camera, Check, Save, Trophy, X } from 'lucide-react'
 import type { DayId, LoggedExercise, Workout } from '@/types'
 import { getDay, type RoutineSlot } from '@/lib/routine'
 import { checkPR, getPR, workoutVolume } from '@/lib/stats'
 import { getWorkouts, saveWorkout } from '@/lib/workouts'
 import { usePerson } from '@/components/PersonScope'
 import { NoRoutine } from '@/components/NoRoutine'
+import { addPhoto } from '@/lib/photos'
+import { useObjectUrl } from '@/lib/hooks'
 import { cn, fmtVolume, toDateInputValue, fromDateInputValue, uid } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
@@ -27,6 +29,11 @@ export function LogWorkout() {
   const [date, setDate] = useState(() => toDateInputValue(new Date()))
   const [entries, setEntries] = useState<LoggedExercise[]>([])
   const [saved, setSaved] = useState(false)
+  // Held until the session is saved, so the photos can be filed against its id.
+  const [photos, setPhotos] = useState<File[]>([])
+  const [savingPhotos, setSavingPhotos] = useState(false)
+  const [photoError, setPhotoError] = useState(0)
+  const photoRef = useRef<HTMLInputElement>(null)
 
   // Snapshot of history taken once - PRs must not shift as the form is typed into.
   const history = useMemo(() => getWorkouts(), [])
@@ -77,7 +84,7 @@ export function LogWorkout() {
   }
   const volume = workoutVolume(draft)
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Keep only exercises that were actually touched, so partial sessions stay tidy.
     const exercises = entries
       .map((entry) => ({
@@ -88,7 +95,29 @@ export function LogWorkout() {
 
     if (!exercises.length) return
 
-    saveWorkout({ ...draft, exercises })
+    const workout = { ...draft, exercises }
+    saveWorkout(workout)
+
+    if (photos.length) {
+      setSavingPhotos(true)
+      let failed = 0
+      for (const file of photos) {
+        try {
+          await addPhoto(person.id, file, {
+            workoutId: workout.id,
+            dayId: workout.dayId,
+            date: workout.date,
+          })
+        } catch {
+          // The session itself is already saved. A photo that will not store is
+          // worth reporting, but it must never cost the user their workout.
+          failed += 1
+        }
+      }
+      setPhotoError(failed)
+      setSavingPhotos(false)
+    }
+
     setSaved(true)
     setTimeout(() => navigate(href('/history')), 900)
   }
@@ -126,11 +155,11 @@ export function LogWorkout() {
             className={cn(
               'rounded-2xl border p-3 text-left transition-all active:scale-[0.98]',
               d.id === dayId
-                ? 'border-flame bg-gradient-to-br from-flame/20 to-hot/10 shadow-lg shadow-flame/10'
+                ? 'border-accent bg-gradient-to-br from-accent/20 to-accent2/10 shadow-lg shadow-accent/10'
                 : 'border-ink-600 bg-ink-800/60 hover:border-ink-500',
             )}
           >
-            <div className={cn('text-[10px] font-black uppercase tracking-widest', d.id === dayId ? 'text-flame' : 'text-chalk-faint')}>
+            <div className={cn('text-[10px] font-black uppercase tracking-widest', d.id === dayId ? 'text-accent' : 'text-chalk-faint')}>
               Day {d.id}
             </div>
             <div className={cn('mt-0.5 truncate text-xs font-bold', d.id === dayId ? 'text-chalk' : 'text-chalk-muted')}>
@@ -173,9 +202,61 @@ export function LogWorkout() {
         })}
       </div>
 
+      {/* Session photo */}
+      <Card className="p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-bold">Session photo</h2>
+            <p className="mt-0.5 text-[11px] font-semibold text-chalk-faint">
+              {photos.length
+                ? `${photos.length} photo${photos.length === 1 ? '' : 's'} will be saved with this session`
+                : 'Optional. Saved with the session and shown in your gallery.'}
+            </p>
+          </div>
+          <Button variant="secondary" size="sm" onClick={() => photoRef.current?.click()}>
+            <Camera className="h-4 w-4" />
+            Add photo
+          </Button>
+          <input
+            ref={photoRef}
+            id="session-photo"
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={(e) => {
+              const picked = Array.from(e.target.files ?? []).filter((f) =>
+                f.type.startsWith('image/'),
+              )
+              if (picked.length) setPhotos((prev) => [...prev, ...picked])
+              e.target.value = ''
+            }}
+          />
+        </div>
+
+        {photoError > 0 && (
+          <p className="mt-3 rounded-xl bg-amber-500/10 px-3 py-2 text-[11px] font-semibold text-amber-200">
+            The session saved, but {photoError} photo{photoError === 1 ? '' : 's'} could not be
+            stored. Try adding {photoError === 1 ? 'it' : 'them'} again from the gallery.
+          </p>
+        )}
+
+        {photos.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {photos.map((file, i) => (
+              <PhotoChip
+                key={`${file.name}-${i}`}
+                file={file}
+                onRemove={() => setPhotos((prev) => prev.filter((_, n) => n !== i))}
+              />
+            ))}
+          </div>
+        )}
+      </Card>
+
       {/* Sticky save bar */}
       <div className="sticky bottom-24 z-10 lg:bottom-4">
-        <Card className="glass flex items-center gap-3 border-flame/25 p-3">
+        <Card className="glass flex items-center gap-3 border-accent/25 p-3">
           <div className="min-w-0 flex-1">
             <div className="num flex items-center gap-2 text-sm font-black">
               {completedSets} sets
@@ -192,7 +273,7 @@ export function LogWorkout() {
 
           <Button
             onClick={handleSave}
-            disabled={completedSets === 0 || saved}
+            disabled={completedSets === 0 || saved || savingPhotos}
             variant={saved ? 'volt' : 'primary'}
             size="lg"
             className="shrink-0"
@@ -201,6 +282,11 @@ export function LogWorkout() {
               <>
                 <Check className="h-5 w-5" strokeWidth={3} />
                 Saved
+              </>
+            ) : savingPhotos ? (
+              <>
+                <Camera className="h-5 w-5" />
+                Saving photos…
               </>
             ) : (
               <>
@@ -245,4 +331,23 @@ function blankEntry(slot: RoutineSlot, history: Workout[]): LoggedExercise {
       isDropSet: Boolean(slot.dropSet) && i === slot.sets - 1,
     })),
   }
+}
+
+/** Preview of a photo picked for this session, before it is written to the gallery. */
+function PhotoChip({ file, onRemove }: { file: File; onRemove: () => void }) {
+  const url = useObjectUrl(file)
+
+  return (
+    <div className="relative h-16 w-16 overflow-hidden rounded-xl border border-ink-600 bg-ink-900">
+      {url && <img src={url} alt={file.name} className="h-full w-full object-cover" />}
+      <button
+        type="button"
+        onClick={onRemove}
+        aria-label={`Remove ${file.name}`}
+        className="absolute right-0.5 top-0.5 rounded-lg bg-ink-950/80 p-0.5 text-chalk-muted hover:text-chalk"
+      >
+        <X className="h-3.5 w-3.5" strokeWidth={3} />
+      </button>
+    </div>
+  )
 }

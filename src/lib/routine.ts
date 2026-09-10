@@ -38,6 +38,45 @@ export interface RoutineDay {
   slots: RoutineSlot[]
 }
 
+/**
+ * Which broad movement pattern a lift belongs to.
+ *
+ * Comparison across people works at this level rather than exercise by exercise,
+ * because two people's routines need not share a single lift. Anything missing
+ * from the map below is left out of the comparison rather than guessed at.
+ */
+export type MuscleGroup = 'legs' | 'push' | 'pull'
+
+export const MUSCLE_GROUPS: { id: MuscleGroup; name: string }[] = [
+  { id: 'legs', name: 'Legs' },
+  { id: 'push', name: 'Push' },
+  { id: 'pull', name: 'Pull' },
+]
+
+export const EXERCISE_GROUPS: Record<string, MuscleGroup> = {
+  'barbell-squats': 'legs',
+  'barbell-deadlifts': 'legs',
+  'split-squats': 'legs',
+  'one-legged-rdls': 'legs',
+  'adductor-machine': 'legs',
+  'abductor-machine': 'legs',
+  'calf-training': 'legs',
+  'incline-dumbbell-press': 'push',
+  'incline-barbell-bench-press': 'push',
+  'lateral-raises': 'push',
+  'one-arm-pullup-training': 'pull',
+  'weighted-pullups-volume': 'pull',
+  'weighted-pullups-heavy': 'pull',
+  'weighted-muscle-ups': 'pull',
+  'chest-supported-row': 'pull',
+  'machine-preacher-curls': 'pull',
+  'hammer-curls': 'pull',
+}
+
+export function groupOf(exerciseId: string): MuscleGroup | undefined {
+  return EXERCISE_GROUPS[exerciseId]
+}
+
 /** Canonical names, used wherever an exercise is shown outside its day. */
 export const EXERCISE_NAMES: Record<string, string> = {
   'barbell-squats': 'Barbell Squats',
@@ -363,4 +402,30 @@ export function findSlot(routine: RoutineDay[], exerciseId: string): RoutineSlot
     if (slot) return slot
   }
   return undefined
+}
+
+/** Nearest sensible plate or stack increment: 2.5 kg on the big lifts, 0.5 kg on the small ones. */
+function roundLoad(kg: number): number {
+  if (kg >= 20) return Math.max(2.5, Math.round(kg / 2.5) * 2.5)
+  return Math.max(0.5, Math.round(kg * 2) / 2)
+}
+
+/**
+ * The same split at a different starting strength.
+ *
+ * Everyone currently trains `FULL_BODY_3`; only the numbers they start from
+ * differ. Prescribed sets and reps are untouched - only the pre-fill weights
+ * move - and bodyweight lifts stay bodyweight.
+ *
+ * This is a starting point, not a constraint: give a person a hand-written
+ * routine in `people.ts` whenever theirs should genuinely differ.
+ */
+export function scaledFullBody3(factor: number): RoutineDay[] {
+  return FULL_BODY_3.map((day) => ({
+    ...day,
+    slots: day.slots.map((slot) => ({
+      ...slot,
+      startWeight: slot.startWeight === null ? null : roundLoad(slot.startWeight * factor),
+    })),
+  }))
 }

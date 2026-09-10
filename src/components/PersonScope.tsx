@@ -1,6 +1,6 @@
-import { createContext, useContext, useMemo } from 'react'
+import React, { createContext, useContext, useMemo } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
-import { findPerson, personPath, type Person } from '@/lib/people'
+import { findPerson, personPath, themeVars, type Person } from '@/lib/people'
 import type { RoutineDay } from '@/lib/routine'
 import { setActivePerson } from '@/lib/storage'
 import { Layout } from './Layout'
@@ -47,7 +47,14 @@ export function PersonScope() {
 
   return (
     <PersonContext.Provider value={value}>
-      <Layout />
+      {/* Every accent class below resolves through these variables, so the whole
+          interface takes on this person's colours. */}
+      <div
+        className="app-glow min-h-full"
+        style={themeVars(person.theme) as React.CSSProperties}
+      >
+        <Layout />
+      </div>
     </PersonContext.Provider>
   )
 }

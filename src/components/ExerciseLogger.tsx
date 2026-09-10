@@ -198,7 +198,7 @@ export function ExerciseLogger({ slot, logged, pr, onChange }: ExerciseLoggerPro
                   checked={set.done}
                   onChange={(next) => updateSet(i, { done: next })}
                   label={`Set ${i + 1} done`}
-                  tone={result.isPR ? 'volt' : 'flame'}
+                  tone={result.isPR ? 'volt' : 'accent'}
                 />
 
                 {logged.sets.length > 1 && (
@@ -219,7 +219,7 @@ export function ExerciseLogger({ slot, logged, pr, onChange }: ExerciseLoggerPro
         <button
           type="button"
           onClick={addSet}
-          className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-ink-500 py-2 text-xs font-bold text-chalk-muted transition-colors hover:border-flame/50 hover:text-flame"
+          className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-ink-500 py-2 text-xs font-bold text-chalk-muted transition-colors hover:border-accent/50 hover:text-accent"
         >
           <Plus className="h-3.5 w-3.5" strokeWidth={3} />
           Add set

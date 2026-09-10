@@ -8,17 +8,17 @@ interface StatCardProps {
   unit?: string
   hint?: string
   icon: LucideIcon
-  tone?: 'flame' | 'hot' | 'volt' | 'chalk'
+  tone?: 'accent' | 'accent2' | 'volt' | 'chalk'
 }
 
 const tones = {
-  flame: { icon: 'text-flame bg-flame/12', value: 'text-chalk' },
-  hot: { icon: 'text-hot bg-hot/12', value: 'text-chalk' },
+  accent: { icon: 'text-accent bg-accent/12', value: 'text-chalk' },
+  accent2: { icon: 'text-accent2 bg-accent2/12', value: 'text-chalk' },
   volt: { icon: 'text-volt bg-volt/12', value: 'text-volt' },
   chalk: { icon: 'text-chalk-muted bg-ink-700', value: 'text-chalk' },
 }
 
-export function StatCard({ label, value, unit, hint, icon: Icon, tone = 'flame' }: StatCardProps) {
+export function StatCard({ label, value, unit, hint, icon: Icon, tone = 'accent' }: StatCardProps) {
   const t = tones[tone]
   return (
     <Card className="p-4">

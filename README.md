@@ -13,9 +13,11 @@ browser.
 - **Log Workout** — pick Day 1/2/3, tick warmups, log weight × reps per set. PRs flash lime
   as you type. Prescribed sets are pre-filled from last time; add or remove sets on the day.
 - **Routine** — read-only view of all three days with warmup, superset and drop-set markers.
-- **Progress** — line chart per exercise (top set or estimated 1RM) and a 12-week volume bar chart.
+- **Progress** — line chart per exercise (top set or estimated 1RM) and a 12-week volume bar
+  chart, plus **Compare everyone**: who is actually improving, measured against their own numbers.
 - **1RM Board** — your tested one-rep maxes, entered by hand, with dated history and a chart.
-- **History** — every past session, expandable, filterable by day, deletable. Export/import backup.
+- **History** — every past session, expandable, filterable by day, deletable. Export/import
+  backup, and a **Photos** gallery of the shots taken at each session.
 
 ## Who uses it
 
@@ -24,22 +26,25 @@ The roster is hardcoded in `src/lib/people.ts`, the same way the routines are.
 | Person | Accent | Routine |
 | --- | --- | --- |
 | Macsy | Orange | The 3-day full body split |
-| Mitchy | Lime | None yet |
-| Mezza | Pink | None yet |
+| Mitchy | Lime | The same split, started ~25% lighter |
+| Mezza | Pink | The same split, started ~45% lighter |
 
-Each person's workouts, tested maxes, PRs, streak and charts are entirely their own, and so are
-the days they train. Nothing one person logs can appear in another's numbers. The person is part
-of the URL, so `/p/macsy/progress` and `/p/mezza/progress` are different pages, and **Switch
-person** in the sidebar (or the name chip in the mobile header) goes back to the picker.
+Everyone currently trains the same days, from different starting loads — a convenience while the
+app fills out, not an assumption. `scaledFullBody3(factor)` builds the split at someone's own
+numbers, and anyone can be handed a completely different routine the moment theirs should differ.
+Every screen follows from whatever their routine says, including having none at all.
 
-Someone whose routine has not been written yet has no training days. Rather than showing them
-someone else's split or a dashboard of zeroes, the pages that need days — Home, Log, Routine and
-Progress — say **No routine yet**. History and the 1RM Board still work, since neither depends
-on a routine.
+Each person's workouts, photos, tested maxes, PRs, streak and charts are entirely their own. The
+person is part of the URL, so `/p/macsy/progress` and `/p/mezza/progress` are different pages, and
+**Switch person** in the sidebar (or the name chip in the mobile header) goes back to the picker.
 
-To add someone, add an entry to `PEOPLE` with an unused accent and either an existing routine or
-a new one. Avatars are drawn from each person's initials rather than uploaded — the app ships no
-image assets and stores nothing on a server.
+The interface is repainted in whoever's section you are in: their accent drives buttons, active
+tabs, links, charts and the ambient background wash. Lime carries dark text where the others carry
+white, so a bright accent never leaves a button unreadable. The lime "PR" colour is deliberately
+*not* per person — it means the same thing on everyone's screen.
+
+To add someone, add an entry to `PEOPLE` with an unused accent and a routine. Avatars are drawn
+from each person's initials rather than uploaded — the app ships no image assets.
 
 ## The routines are fixed
 
@@ -48,8 +53,23 @@ days, their exercises and the starting weights are all hardcoded. There is delib
 settings screen — the only way to change a routine is to edit that file. This keeps the numbers
 behind your charts honest.
 
-`FULL_BODY_3` is the 3-day full body split, currently Macsy's. A person can be given an existing
-routine or a new one; give someone `[]` and they have no training days yet.
+Give someone `[]` and they have no training days: rather than showing them someone else's split
+or a dashboard of zeroes, Home, Log and Routine say **No routine yet**.
+
+## Comparing people
+
+Absolute load is not comparable — whoever is strongest would always look like they were doing
+best, which says nothing about who is improving. So **Compare everyone** measures each person
+against their own starting point:
+
+- Each lift's progress is the ratio of the most recent session to the first one it appears in, so
+  +15% means the same off 40 kg as off 140 kg.
+- Those ratios are averaged **geometrically**, not arithmetically — 1.5x and 0.5x should average
+  out to no change, not to +50%.
+- Results are grouped by movement pattern (**Legs / Push / Pull**) rather than by exercise, so two
+  people can be compared without training a single lift in common. `EXERCISE_GROUPS` maps lifts to
+  patterns; anything unmapped is left out rather than guessed at.
+- A lift needs two logged sessions before it counts. Drop sets are excluded, as they are from PRs.
 
 ## How things are counted
 
@@ -112,8 +132,14 @@ launches full-screen and your data persists between sessions.
 
 ## Your data
 
-Each person's data is stored in this browser under `ironlog:<person>:workouts` and
-`ironlog:<person>:maxes` - so `ironlog:macsy:workouts`, `ironlog:mitchy:maxes`, and so on.
+Each person's log is stored in this browser under `ironlog:<person>:workouts` and
+`ironlog:<person>:maxes` — so `ironlog:macsy:workouts`, `ironlog:mitchy:maxes`, and so on.
+
+Photos are different. They live in **IndexedDB** (`ironlog-photos`), because a single compressed
+photo is larger than an entire training history and a handful would blow the ~5 MB localStorage
+quota and take the workouts down with it. Each one is resized to 1280px and re-encoded as JPEG on
+the way in, which turns a 4 MB phone shot into roughly 150–300 KB.
+
 Nothing is sent anywhere. That means:
 
 - Clearing your browsing data **erases your training log**.
@@ -123,6 +149,9 @@ Use **Export** on the History page now and again and keep the JSON file somewher
 Backups are per person: the file is named after whoever is logged in and stamped with their
 name, and **Import** replaces the log of whoever you are currently in - it will tell you if the
 file came from someone else.
+
+**Photos are not included in the backup.** Putting them in would balloon the JSON from kilobytes
+to megabytes. Save any photo you would hate to lose from the gallery — each one has a Save button.
 
 A log written before the app supported more than one person is moved into Macsy's namespace
 automatically on first load, so nothing is lost in the upgrade.

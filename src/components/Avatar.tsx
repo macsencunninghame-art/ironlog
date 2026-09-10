@@ -14,23 +14,30 @@ interface AvatarProps {
 }
 
 /**
- * A monogram disc in the person's accent colours.
+ * A monogram disc in the person's own colours.
+ *
+ * Painted from the theme inline rather than through accent classes, because the
+ * picker shows every person at once and each disc needs its own colours there,
+ * not the accent of whatever section is in scope.
  *
  * Drawn rather than loaded: the app ships no image assets and stores nothing on a
- * server, so an uploaded photo would have to live in localStorage alongside the log.
+ * server, so an uploaded photo would have to live in the browser alongside the log.
  */
 export function Avatar({ person, size = 'md', className }: AvatarProps) {
+  const { accent, accent2, fg } = person.theme
   return (
     <span
       aria-hidden
       className={cn(
-        'flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br font-black tracking-tight shadow-lg',
+        'flex shrink-0 items-center justify-center rounded-full font-black tracking-tight',
         SIZES[size],
-        person.gradient,
-        person.fg,
-        person.glow,
         className,
       )}
+      style={{
+        backgroundImage: `linear-gradient(135deg, ${accent}, ${accent2})`,
+        color: fg,
+        boxShadow: `0 10px 24px -8px ${accent}66`,
+      }}
     >
       {person.initials}
     </span>

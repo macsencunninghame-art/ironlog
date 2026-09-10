@@ -1,15 +1,15 @@
 import type { HTMLAttributes } from 'react'
 import { cn } from '@/lib/utils'
 
-type Tone = 'warmup' | 'superset' | 'drop' | 'pr' | 'muted' | 'flame'
+type Tone = 'warmup' | 'superset' | 'drop' | 'pr' | 'muted' | 'accent'
 
 const tones: Record<Tone, string> = {
   warmup: 'bg-sky-400/10 text-sky-300 border-sky-400/25',
-  superset: 'bg-hot/10 text-hot-soft border-hot/30',
+  superset: 'bg-accent2/10 text-accent2-soft border-accent2/30',
   drop: 'bg-violet-400/10 text-violet-300 border-violet-400/25',
   pr: 'bg-volt/15 text-volt border-volt/40',
   muted: 'bg-ink-700 text-chalk-muted border-ink-600',
-  flame: 'bg-flame/10 text-flame-soft border-flame/30',
+  accent: 'bg-accent/10 text-accent-soft border-accent/30',
 }
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {

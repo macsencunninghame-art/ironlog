@@ -5,6 +5,14 @@
 @layer base {
   :root {
     color-scheme: dark;
+
+    /* Overridden per person by PersonScope. Space-separated RGB so Tailwind's
+       opacity modifiers (accent/30) resolve. */
+    --accent: 255 107 24;
+    --accent-soft: 255 138 71;
+    --accent-deep: 224 78 0;
+    --accent-2: 255 45 138;
+    --accent-fg: 255 255 255;
   }
 
   html,
@@ -15,11 +23,6 @@
 
   body {
     @apply bg-ink-900 text-chalk font-sans antialiased;
-    background-image:
-      radial-gradient(60rem 40rem at 12% -10%, rgba(255, 107, 24, 0.16), transparent 60%),
-      radial-gradient(50rem 36rem at 92% 6%, rgba(255, 45, 138, 0.13), transparent 62%),
-      radial-gradient(46rem 34rem at 50% 108%, rgba(198, 255, 61, 0.08), transparent 60%);
-    background-attachment: fixed;
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -61,8 +64,17 @@
     backdrop-filter: blur(12px);
   }
 
-  .text-gradient-flame {
-    background: linear-gradient(100deg, #FF6B18, #FF2D8A);
+  /* Ambient wash in whoever's colours are currently in scope. */
+  .app-glow {
+    background-image:
+      radial-gradient(60rem 40rem at 12% -10%, rgb(var(--accent) / 0.16), transparent 60%),
+      radial-gradient(50rem 36rem at 92% 6%, rgb(var(--accent-2) / 0.13), transparent 62%),
+      radial-gradient(46rem 34rem at 50% 108%, rgba(198, 255, 61, 0.08), transparent 60%);
+    background-attachment: fixed;
+  }
+
+  .text-gradient-accent {
+    background: linear-gradient(100deg, rgb(var(--accent)), rgb(var(--accent-2)));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
