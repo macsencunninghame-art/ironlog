@@ -111,7 +111,7 @@ export function CompareChart({ className, bare = false }: CompareChartProps) {
                             <span
                               className={cn(
                                 'num w-14 shrink-0 text-right text-[11px] font-black',
-                                pct < 0 ? 'text-red-300' : 'text-chalk',
+                                pct < 0 ? 'text-red-700' : 'text-chalk',
                               )}
                             >
                               {fmtSignedPct(pct)}

@@ -29,7 +29,7 @@ export function SessionCard({ workout }: SessionCardProps) {
         className="flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-ink-700/30"
         aria-expanded={open}
       >
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-accent to-accent2 text-base font-black text-white shadow-lg shadow-accent/20">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-accent to-accent2 text-base font-black text-accent-fg shadow-lg shadow-accent/20">
           {workout.dayId}
         </div>
 
@@ -85,7 +85,7 @@ export function SessionCard({ workout }: SessionCardProps) {
                           className={cn(
                             'num rounded-lg border px-2 py-1 text-xs font-bold',
                             set.isDropSet
-                              ? 'border-violet-400/25 bg-violet-400/10 text-violet-300'
+                              ? 'border-violet-500/30 bg-violet-500/10 text-violet-700'
                               : 'border-ink-600 bg-ink-800 text-chalk',
                           )}
                         >

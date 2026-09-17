@@ -7,7 +7,7 @@ export function StorageWarning({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        'rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-xs font-medium text-amber-200',
+        'rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-xs font-medium text-amber-700',
         className,
       )}
     >

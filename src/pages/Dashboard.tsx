@@ -210,7 +210,7 @@ export function Dashboard() {
                   to={href("/history")}
                   className="flex items-center gap-3 rounded-2xl bg-ink-900/50 p-3 transition-colors hover:bg-ink-700/50"
                 >
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent2 text-sm font-black text-white">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent2 text-sm font-black text-accent-fg">
                     {workout.dayId}
                   </span>
                   <div className="min-w-0 flex-1">

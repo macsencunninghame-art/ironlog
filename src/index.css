@@ -4,15 +4,24 @@
 
 @layer base {
   :root {
-    color-scheme: dark;
+    color-scheme: light;
 
     /* Overridden per person by PersonScope. Space-separated RGB so Tailwind's
        opacity modifiers (accent/30) resolve. */
-    --accent: 255 107 24;
-    --accent-soft: 255 138 71;
-    --accent-deep: 224 78 0;
-    --accent-2: 255 45 138;
+    --accent: 209 73 0;
+    --accent-soft: 255 122 46;
+    --accent-deep: 168 55 0;
+    --accent-2: 229 21 127;
     --accent-fg: 255 255 255;
+    --accent-hex: #D14900;
+    --accent2-hex: #E5157F;
+
+    /* Chart furniture, so d3 follows the theme instead of hardcoding it. */
+    --chart-grid: #DCE3ED;
+    --chart-label: #6E7A8D;
+    --chart-surface: #FFFFFF;
+    --chart-text: #151B2B;
+    --chart-empty: #EDF1F7;
   }
 
   html,
@@ -44,7 +53,7 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: #243049;
+    background: #C4CDDB;
     border-radius: 999px;
   }
 }
@@ -67,16 +76,16 @@
   }
 
   .glass {
-    background: linear-gradient(160deg, rgba(26, 34, 51, 0.92), rgba(11, 15, 26, 0.85));
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.95), rgba(243, 246, 250, 0.9));
     backdrop-filter: blur(12px);
   }
 
   /* Ambient wash in whoever's colours are currently in scope. */
   .app-glow {
     background-image:
-      radial-gradient(60rem 40rem at 12% -10%, rgb(var(--accent) / 0.16), transparent 60%),
-      radial-gradient(50rem 36rem at 92% 6%, rgb(var(--accent-2) / 0.13), transparent 62%),
-      radial-gradient(46rem 34rem at 50% 108%, rgba(198, 255, 61, 0.08), transparent 60%);
+      radial-gradient(60rem 40rem at 12% -10%, rgb(var(--accent) / 0.09), transparent 60%),
+      radial-gradient(50rem 36rem at 92% 6%, rgb(var(--accent-2) / 0.07), transparent 62%),
+      radial-gradient(46rem 34rem at 50% 108%, rgba(62, 143, 0, 0.05), transparent 60%);
     background-attachment: fixed;
   }
 

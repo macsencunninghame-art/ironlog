@@ -111,7 +111,7 @@ export function ExerciseLogger({ slot, logged, pr, onChange }: ExerciseLoggerPro
       <div className="p-4">
         {slot.warmupSets > 0 && (
           <div className="mb-4 flex items-center gap-3 rounded-2xl border border-sky-400/20 bg-sky-400/5 px-3 py-2.5">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-sky-300">Warmup</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-sky-700">Warmup</span>
             <div className="ml-auto flex gap-2">
               {logged.warmupsDone.map((done, i) => (
                 <Checkbox
@@ -155,7 +155,7 @@ export function ExerciseLogger({ slot, logged, pr, onChange }: ExerciseLoggerPro
                 <div className="flex w-6 shrink-0 flex-col items-center">
                   <span className="num text-sm font-black text-chalk-muted">{i + 1}</span>
                   {set.isDropSet && (
-                    <span className="text-[8px] font-bold uppercase text-violet-300">drop</span>
+                    <span className="text-[8px] font-bold uppercase text-violet-700">drop</span>
                   )}
                 </div>
 
@@ -211,7 +211,7 @@ export function ExerciseLogger({ slot, logged, pr, onChange }: ExerciseLoggerPro
                     type="button"
                     onClick={() => removeSet(i)}
                     aria-label={`Remove set ${i + 1}`}
-                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-chalk-faint transition-colors hover:bg-ink-700 hover:text-red-300"
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-chalk-faint transition-colors hover:bg-ink-700 hover:text-red-700"
                   >
                     <Minus className="h-4 w-4" />
                   </button>

@@ -11,7 +11,7 @@ export interface CheckboxProps {
 
 export function Checkbox({ checked, onChange, label, className, tone = 'accent' }: CheckboxProps) {
   const activeTone =
-    tone === 'volt' ? 'bg-volt border-volt text-ink-950' : 'bg-accent border-accent text-white'
+    tone === 'volt' ? 'bg-volt border-volt text-ink-950' : 'bg-accent border-accent text-accent-fg'
 
   return (
     <button

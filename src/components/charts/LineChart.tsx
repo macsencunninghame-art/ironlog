@@ -1,6 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import * as d3 from 'd3'
 
+/** Theme colours, read from CSS so the charts follow the palette rather than fixing it. */
+function themeColour(name: string, fallback: string): string {
+  if (typeof window === 'undefined') return fallback
+  const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+  return value || fallback
+}
+
+
 export interface LinePoint {
   date: Date
   value: number
@@ -22,7 +30,7 @@ interface LineChartProps {
 export function LineChart({
   points,
   height = 240,
-  color = '#FF6B18',
+  color = '#D14900',
   suffix = 'kg',
   minimal = false,
   format,
@@ -99,7 +107,7 @@ export function LineChart({
             .tickFormat(() => ''),
         )
         .call((sel) => sel.select('.domain').remove())
-        .call((sel) => sel.selectAll('line').attr('stroke', '#243049').attr('stroke-dasharray', '3 4'))
+        .call((sel) => sel.selectAll('line').attr('stroke', themeColour('--chart-grid', '#DCE3ED')).attr('stroke-dasharray', '3 4'))
 
       g.append('g')
         .call(d3.axisLeft(y).ticks(5).tickFormat((d) => (format ? format(d as number) : `${d}`)))
@@ -108,7 +116,7 @@ export function LineChart({
         .call((sel) =>
           sel
             .selectAll('text')
-            .attr('fill', '#8B97B2')
+            .attr('fill', themeColour('--chart-label', '#6E7A8D'))
             .attr('font-size', 11)
             .style('font-variant-numeric', 'tabular-nums'),
         )
@@ -122,9 +130,9 @@ export function LineChart({
             .ticks(tickCount)
             .tickFormat((d) => d3.timeFormat('%-d %b')(d as Date)),
         )
-        .call((sel) => sel.select('.domain').attr('stroke', '#243049'))
-        .call((sel) => sel.selectAll('line').attr('stroke', '#243049'))
-        .call((sel) => sel.selectAll('text').attr('fill', '#8B97B2').attr('font-size', 11))
+        .call((sel) => sel.select('.domain').attr('stroke', themeColour('--chart-grid', '#DCE3ED')))
+        .call((sel) => sel.selectAll('line').attr('stroke', themeColour('--chart-grid', '#DCE3ED')))
+        .call((sel) => sel.selectAll('text').attr('fill', themeColour('--chart-label', '#6E7A8D')).attr('font-size', 11))
     }
 
     const area = d3
@@ -158,7 +166,7 @@ export function LineChart({
         .attr('cx', (d) => x(d.date))
         .attr('cy', (d) => y(d.value))
         .attr('r', 4.5)
-        .attr('fill', '#0B0F1A')
+        .attr('fill', themeColour('--chart-surface', '#FFFFFF'))
         .attr('stroke', color)
         .attr('stroke-width', 2.5)
     } else {
@@ -183,22 +191,22 @@ export function LineChart({
       .attr('stroke-width', 1)
       .attr('stroke-dasharray', '4 4')
       .attr('opacity', 0.6)
-    focus.append('circle').attr('r', 6).attr('fill', color).attr('stroke', '#0B0F1A').attr('stroke-width', 2.5)
+    focus.append('circle').attr('r', 6).attr('fill', color).attr('stroke', themeColour('--chart-surface', '#FFFFFF')).attr('stroke-width', 2.5)
 
     const label = focus.append('g')
     const labelBg = label
       .append('rect')
       .attr('rx', 8)
-      .attr('fill', '#121826')
-      .attr('stroke', '#243049')
+      .attr('fill', themeColour('--chart-surface', '#FFFFFF'))
+      .attr('stroke', themeColour('--chart-grid', '#DCE3ED'))
       .attr('height', 40)
     const labelValue = label
       .append('text')
-      .attr('fill', '#E9EEF9')
+      .attr('fill', themeColour('--chart-text', '#151B2B'))
       .attr('font-size', 12)
       .attr('font-weight', 700)
       .style('font-variant-numeric', 'tabular-nums')
-    const labelDate = label.append('text').attr('fill', '#8B97B2').attr('font-size', 10)
+    const labelDate = label.append('text').attr('fill', themeColour('--chart-label', '#6E7A8D')).attr('font-size', 10)
 
     const bisect = d3.bisector<LinePoint, Date>((d) => d.date).center
 

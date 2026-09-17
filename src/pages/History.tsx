@@ -133,10 +133,10 @@ export function HistoryPage() {
         {pendingFile && (
           <div className="mt-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3">
             <div className="flex items-start gap-2">
-              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-300" />
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-bold text-amber-200">Replace everything?</p>
-                <p className="mt-1 text-[11px] leading-relaxed text-amber-200/80">
+                <p className="text-xs font-bold text-amber-700">Replace everything?</p>
+                <p className="mt-1 text-[11px] leading-relaxed text-amber-700/80">
                   Importing <span className="font-semibold">{pendingFile.name}</span> overwrites all{' '}
                   {workouts.length} logged session{workouts.length === 1 ? '' : 's'} and every 1RM
                   entry. This cannot be undone.
@@ -158,7 +158,7 @@ export function HistoryPage() {
           <p
             className={cn(
               'mt-3 rounded-xl px-3 py-2 text-[11px] font-semibold',
-              notice.ok ? 'bg-volt/10 text-volt' : 'bg-red-500/10 text-red-300',
+              notice.ok ? 'bg-volt/10 text-volt' : 'bg-red-500/10 text-red-700',
             )}
           >
             {notice.message}
@@ -187,7 +187,7 @@ function FilterChip({
       className={cn(
         'rounded-xl px-3.5 py-2 text-xs font-bold transition-all active:scale-95',
         active
-          ? 'bg-gradient-to-r from-accent to-accent2 text-white shadow-lg shadow-accent/20'
+          ? 'bg-gradient-to-r from-accent to-accent2 text-accent-fg shadow-lg shadow-accent/20'
           : 'border border-ink-600 bg-ink-800/60 text-chalk-muted hover:text-chalk',
       )}
     >

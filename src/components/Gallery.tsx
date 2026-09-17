@@ -92,7 +92,7 @@ export function Gallery({ personId, personName, routine }: GalleryProps) {
           Photos are resized on the way in and shared with everyone. They are not part of the
           History backup file.
           {photosAreEphemeral() && (
-            <span className="mt-1 block text-amber-200">
+            <span className="mt-1 block text-amber-700">
               This browser is blocking photo storage, so these will be gone when you close the tab.
             </span>
           )}

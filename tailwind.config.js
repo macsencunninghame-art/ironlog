@@ -18,32 +18,29 @@ export default {
         accent2: {
           DEFAULT: 'rgb(var(--accent-2) / <alpha-value>)',
         },
+        // Surfaces, lightest first. The scale keeps its roles - 950 is chrome,
+        // 900 the page, 800 a card, 700 a subtle fill, 600 and 500 borders - so
+        // components did not have to change when the theme went light.
         ink: {
-          950: '#070A12',
-          900: '#0B0F1A',
-          800: '#121826',
-          700: '#1A2233',
-          600: '#243049',
-          500: '#33415E',
+          950: '#FFFFFF',
+          900: '#F3F6FA',
+          800: '#FFFFFF',
+          700: '#EDF1F7',
+          600: '#DCE3ED',
+          500: '#BCC6D6',
         },
-        flame: {
-          DEFAULT: '#FF6B18',
-          soft: '#FF8A47',
-          deep: '#E04E00',
-        },
-        hot: {
-          DEFAULT: '#FF2D8A',
-          soft: '#FF6BAC',
-        },
-        volt: {
-          DEFAULT: '#C6FF3D',
-          soft: '#DBFF85',
-          deep: '#9BD400',
-        },
+        // Text, darkest first.
         chalk: {
-          DEFAULT: '#E9EEF9',
-          muted: '#8B97B2',
-          faint: '#5A6685',
+          DEFAULT: '#151B2B',
+          muted: '#4B5668',
+          faint: '#6E7A8D',
+        },
+        // Semantic: a PR, a completed day, anything that went well. Not anyone's
+        // accent, and dark enough to read as text on white.
+        volt: {
+          DEFAULT: '#3E8F00',
+          soft: '#59B215',
+          deep: '#2C6600',
         },
       },
       fontFamily: {

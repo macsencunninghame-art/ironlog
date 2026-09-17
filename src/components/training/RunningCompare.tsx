@@ -83,7 +83,7 @@ export function RunningCompare({ currentPersonId }: { currentPersonId: string })
                         <span
                           className={cn(
                             'num text-xs font-black',
-                            v.pct === null ? 'text-chalk-faint' : v.pct > 0 ? 'text-volt' : v.pct < 0 ? 'text-red-300' : 'text-chalk-muted',
+                            v.pct === null ? 'text-chalk-faint' : v.pct > 0 ? 'text-volt' : v.pct < 0 ? 'text-red-700' : 'text-chalk-muted',
                           )}
                         >
                           {v.pct === null ? 'No data' : fmtSignedPct(v.pct)}

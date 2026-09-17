@@ -44,9 +44,9 @@ person is part of the URL, so `/p/macsy/progress` and `/p/mezza/progress` are di
 **Switch person** in the sidebar (or the name chip in the mobile header) goes back to the picker.
 
 The interface is repainted in whoever's section you are in: their accent drives buttons, active
-tabs, links, charts and the ambient background wash. Lime carries dark text where the others carry
-white, so a bright accent never leaves a button unreadable. The lime "PR" colour is deliberately
-*not* per person — it means the same thing on everyone's screen.
+tabs, links, charts and the ambient background wash. Every accent is dark enough to carry white
+text on a fill and to read as text on a white page. The green "PR" colour is deliberately *not*
+per person — it means the same thing on everyone's screen.
 
 To add someone, add an entry to `PEOPLE` with an unused accent and a routine. Avatars are drawn
 from each person's initials rather than uploaded — the app ships no image assets.

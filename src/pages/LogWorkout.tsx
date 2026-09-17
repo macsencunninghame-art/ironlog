@@ -243,7 +243,7 @@ export function LogWorkout() {
         </div>
 
         {photoError > 0 && (
-          <p className="mt-3 rounded-xl bg-amber-500/10 px-3 py-2 text-[11px] font-semibold text-amber-200">
+          <p className="mt-3 rounded-xl bg-amber-500/10 px-3 py-2 text-[11px] font-semibold text-amber-700">
             The session saved, but {photoError} photo{photoError === 1 ? '' : 's'} could not be
             stored. Try adding {photoError === 1 ? 'it' : 'them'} again from the gallery.
           </p>

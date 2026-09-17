@@ -11,10 +11,10 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variants: Record<Variant, string> = {
   primary:
-    'bg-gradient-to-r from-accent to-accent2 text-white shadow-lg shadow-accent/25 hover:brightness-110 active:brightness-95',
+    'bg-gradient-to-r from-accent to-accent2 text-accent-fg shadow-lg shadow-accent/25 hover:brightness-110 active:brightness-95',
   secondary: 'bg-ink-700 text-chalk border border-ink-600 hover:bg-ink-600',
   ghost: 'text-chalk-muted hover:text-chalk hover:bg-ink-700',
-  danger: 'bg-ink-700 text-red-300 border border-red-500/30 hover:bg-red-500/15 hover:text-red-200',
+  danger: 'bg-ink-700 text-red-700 border border-red-500/30 hover:bg-red-500/15 hover:text-red-800',
   volt: 'bg-volt text-ink-950 font-bold hover:brightness-105 active:brightness-95',
 }
 

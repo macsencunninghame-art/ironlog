@@ -83,13 +83,13 @@ export function LatestPhotos({ className, bare = false }: LatestPhotosProps) {
       </div>
 
       {error && (
-        <p className="mt-3 rounded-xl bg-red-500/10 px-3 py-2 text-[11px] font-semibold text-red-300">
+        <p className="mt-3 rounded-xl bg-red-500/10 px-3 py-2 text-[11px] font-semibold text-red-700">
           {error}
         </p>
       )}
 
       {photosAreEphemeral() && (
-        <p className="mt-3 text-[11px] font-semibold text-amber-200">
+        <p className="mt-3 text-[11px] font-semibold text-amber-700">
           This browser is blocking photo storage, so these will be gone when you close the tab.
         </p>
       )}

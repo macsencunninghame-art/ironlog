@@ -9,7 +9,7 @@ import { cn, fmtSignedPct } from '@/lib/utils'
 function toneFor(pct: number | null): string {
   if (pct === null) return 'text-chalk-faint'
   if (pct > 0.5) return 'text-volt'
-  if (pct < -0.5) return 'text-red-300'
+  if (pct < -0.5) return 'text-red-700'
   return 'text-chalk-muted'
 }
 

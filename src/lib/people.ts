@@ -47,10 +47,11 @@ export const PEOPLE: Person[] = [
     name: 'Macsy',
     initials: 'Ma',
     theme: {
-      accent: '#FF6B18',
-      accentSoft: '#FF8A47',
-      accentDeep: '#E04E00',
-      accent2: '#FF2D8A',
+      // Orange into pink, dark enough to carry white text on a fill.
+      accent: '#D14900',
+      accentSoft: '#FF7A2E',
+      accentDeep: '#A83700',
+      accent2: '#E5157F',
       fg: '#FFFFFF',
     },
     routine: FULL_BODY_3,
@@ -61,12 +62,13 @@ export const PEOPLE: Person[] = [
     name: 'Mitchy',
     initials: 'Mi',
     theme: {
-      accent: '#C6FF3D',
-      accentSoft: '#DBFF85',
-      accentDeep: '#9BD400',
-      accent2: '#34D399',
-      // Lime is far too bright to carry white text.
-      fg: '#070A12',
+      // Was lime, which is invisible on white. Green into teal keeps the
+      // family and reads at any size.
+      accent: '#3E8F00',
+      accentSoft: '#5FB815',
+      accentDeep: '#2C6600',
+      accent2: '#00A06B',
+      fg: '#FFFFFF',
     },
     routine: MITCHY_FULL_BODY,
     sections: ['home', 'gym', 'running'],
@@ -76,10 +78,11 @@ export const PEOPLE: Person[] = [
     name: 'Mezza',
     initials: 'Me',
     theme: {
-      accent: '#FF4FA3',
-      accentSoft: '#FF85C0',
-      accentDeep: '#DB2777',
-      accent2: '#C026D3',
+      // Pink into fuchsia.
+      accent: '#D6197A',
+      accentSoft: '#FF5CAE',
+      accentDeep: '#A00E5A',
+      accent2: '#A81CC4',
       fg: '#FFFFFF',
     },
     routine: scaledFullBody3(0.55),
@@ -90,12 +93,11 @@ export const PEOPLE: Person[] = [
     name: 'McGinley',
     initials: 'Mc',
     theme: {
-      // Violet into blue: the one direction none of the other three occupy, and
-      // dark enough at both ends of the gradient to carry white text.
-      accent: '#8B5CF6',
-      accentSoft: '#A78BFA',
-      accentDeep: '#6D28D9',
-      accent2: '#3B82F6',
+      // Violet into blue - the one direction the other three do not occupy.
+      accent: '#6A3FE0',
+      accentSoft: '#8F6BFF',
+      accentDeep: '#4E29B5',
+      accent2: '#2563EB',
       fg: '#FFFFFF',
     },
     // Placeholder starting loads - nothing is known about his numbers yet.
@@ -150,6 +152,9 @@ export function themeVars(theme: PersonTheme): Record<string, string> {
     '--accent-deep': rgbTriplet(theme.accentDeep),
     '--accent-2': rgbTriplet(theme.accent2),
     '--accent-fg': rgbTriplet(theme.fg),
+    // d3 wants a colour string rather than a triplet.
+    '--accent-hex': theme.accent,
+    '--accent2-hex': theme.accent2,
   }
 }
 

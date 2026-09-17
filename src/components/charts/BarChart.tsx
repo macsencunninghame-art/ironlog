@@ -1,6 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import * as d3 from 'd3'
 
+/** Theme colours, read from CSS so the charts follow the palette rather than fixing it. */
+function themeColour(name: string, fallback: string): string {
+  if (typeof window === 'undefined') return fallback
+  const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+  return value || fallback
+}
+
+
 export interface BarDatum {
   label: string
   value: number
@@ -63,8 +71,8 @@ export function BarChart({ data, height = 240, suffix = 'kg' }: BarChartProps) {
       .attr('id', gradientId)
       .attr('x1', '0').attr('y1', '0')
       .attr('x2', '0').attr('y2', '1')
-    gradient.append('stop').attr('offset', '0%').attr('stop-color', '#FF6B18')
-    gradient.append('stop').attr('offset', '100%').attr('stop-color', '#FF2D8A')
+    gradient.append('stop').attr('offset', '0%').attr('stop-color', themeColour('--accent-hex', '#D14900'))
+    gradient.append('stop').attr('offset', '100%').attr('stop-color', themeColour('--accent2-hex', '#E5157F'))
 
     g.append('g')
       .call(
@@ -78,11 +86,11 @@ export function BarChart({ data, height = 240, suffix = 'kg' }: BarChartProps) {
           }),
       )
       .call((sel) => sel.select('.domain').remove())
-      .call((sel) => sel.selectAll('line').attr('stroke', '#243049').attr('stroke-dasharray', '3 4'))
+      .call((sel) => sel.selectAll('line').attr('stroke', themeColour('--chart-grid', '#DCE3ED')).attr('stroke-dasharray', '3 4'))
       .call((sel) =>
         sel
           .selectAll('text')
-          .attr('fill', '#8B97B2')
+          .attr('fill', themeColour('--chart-label', '#6E7A8D'))
           .attr('font-size', 11)
           .style('font-variant-numeric', 'tabular-nums'),
       )
@@ -92,24 +100,24 @@ export function BarChart({ data, height = 240, suffix = 'kg' }: BarChartProps) {
     g.append('g')
       .attr('transform', `translate(0,${innerH})`)
       .call(d3.axisBottom(x).tickFormat((d, i) => (i % step === 0 ? d : '')))
-      .call((sel) => sel.select('.domain').attr('stroke', '#243049'))
+      .call((sel) => sel.select('.domain').attr('stroke', themeColour('--chart-grid', '#DCE3ED')))
       .call((sel) => sel.selectAll('line').remove())
-      .call((sel) => sel.selectAll('text').attr('fill', '#8B97B2').attr('font-size', 10))
+      .call((sel) => sel.selectAll('text').attr('fill', themeColour('--chart-label', '#6E7A8D')).attr('font-size', 10))
 
     const tooltip = g.append('g').style('display', 'none')
     const tipBg = tooltip
       .append('rect')
       .attr('rx', 8)
       .attr('height', 38)
-      .attr('fill', '#121826')
-      .attr('stroke', '#243049')
+      .attr('fill', themeColour('--chart-surface', '#FFFFFF'))
+      .attr('stroke', themeColour('--chart-grid', '#DCE3ED'))
     const tipValue = tooltip
       .append('text')
-      .attr('fill', '#E9EEF9')
+      .attr('fill', themeColour('--chart-text', '#151B2B'))
       .attr('font-size', 12)
       .attr('font-weight', 700)
       .style('font-variant-numeric', 'tabular-nums')
-    const tipDetail = tooltip.append('text').attr('fill', '#8B97B2').attr('font-size', 10)
+    const tipDetail = tooltip.append('text').attr('fill', themeColour('--chart-label', '#6E7A8D')).attr('font-size', 10)
 
     g.selectAll('.bar')
       .data(data)
@@ -119,7 +127,7 @@ export function BarChart({ data, height = 240, suffix = 'kg' }: BarChartProps) {
       .attr('y', (d) => (d.value > 0 ? y(d.value) : innerH - 2))
       .attr('height', (d) => (d.value > 0 ? innerH - y(d.value) : 2))
       .attr('rx', Math.min(6, x.bandwidth() / 2))
-      .attr('fill', (d) => (d.value > 0 ? `url(#${gradientId})` : '#1A2233'))
+      .attr('fill', (d) => (d.value > 0 ? `url(#${gradientId})` : themeColour('--chart-empty', '#EDF1F7')))
       .style('cursor', 'pointer')
       .on('pointerenter pointermove', function (_event, d) {
         const bx = (x(d.label) ?? 0) + x.bandwidth() / 2
