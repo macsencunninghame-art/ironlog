@@ -1,8 +1,18 @@
-import type { BroncoEntry, IronLogBackup, MaxEntry, RunEntry, Workout } from '@/types'
+import type {
+  BikeEntry,
+  BroncoEntry,
+  IntervalEntry,
+  IronLogBackup,
+  MaxEntry,
+  RunEntry,
+  SwimEntry,
+  Workout,
+} from '@/types'
 import { activeKey, getActivePersonId, readJSON, storageKey, writeJSON } from './storage'
 import { readMaxes, writeMaxes } from './maxes'
 import { findPerson } from './people'
-import { getBroncos, getRuns } from './running'
+import { getBroncos, getIntervals, getRuns } from './running'
+import { getBikes, getSwims } from './tri'
 import { syncSoon } from './sync'
 
 /**
@@ -79,6 +89,9 @@ export function buildBackup(): IronLogBackup {
     maxes: readMaxes(),
     broncos: getBroncos(),
     runs: getRuns(),
+    intervals: getIntervals(),
+    swims: getSwims(),
+    bikes: getBikes(),
   }
 }
 
@@ -145,10 +158,44 @@ export function restoreBackup(raw: string): ImportResult {
       )
     : []
 
+  const intervals = Array.isArray(data.intervals)
+    ? data.intervals.filter(
+        (i): i is IntervalEntry =>
+          !!i &&
+          typeof i.id === 'string' &&
+          typeof i.date === 'string' &&
+          typeof i.distanceM === 'number' &&
+          Array.isArray(i.reps),
+      )
+    : []
+  const swims = Array.isArray(data.swims)
+    ? data.swims.filter(
+        (w): w is SwimEntry =>
+          !!w &&
+          typeof w.id === 'string' &&
+          typeof w.date === 'string' &&
+          typeof w.distanceM === 'number' &&
+          typeof w.seconds === 'number',
+      )
+    : []
+  const bikes = Array.isArray(data.bikes)
+    ? data.bikes.filter(
+        (b): b is BikeEntry =>
+          !!b &&
+          typeof b.id === 'string' &&
+          typeof b.date === 'string' &&
+          typeof b.distanceKm === 'number' &&
+          typeof b.seconds === 'number',
+      )
+    : []
+
   writeJSON(activeKey('workouts'), workouts)
   writeMaxes(maxes)
   writeJSON(activeKey('broncos'), broncos)
   writeJSON(activeKey('runs'), runs)
+  writeJSON(activeKey('intervals'), intervals)
+  writeJSON(activeKey('swims'), swims)
+  writeJSON(activeKey('bikes'), bikes)
 
   const into = activePerson()?.name
   // A file exported by someone else overwrites whoever is logged in now, so say so.
@@ -160,7 +207,8 @@ export function restoreBackup(raw: string): ImportResult {
     message:
       `Restored ${workouts.length} workout${workouts.length === 1 ? '' : 's'}, ` +
       `${maxes.length} max${maxes.length === 1 ? '' : 'es'} and ` +
-      `${broncos.length + runs.length} running entr${broncos.length + runs.length === 1 ? 'y' : 'ies'}` +
+      `${broncos.length + runs.length + intervals.length + swims.length + bikes.length} ` +
+      `training entr${broncos.length + runs.length + intervals.length + swims.length + bikes.length === 1 ? 'y' : 'ies'}` +
       `${into ? ` into ${into}` : ''}.${crossed}`,
     workouts: workouts.length,
     maxes: maxes.length,
