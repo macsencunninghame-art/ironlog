@@ -1,7 +1,7 @@
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { Dumbbell, Users, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { SECTIONS, sectionForPath } from '@/lib/sections'
+import { sectionForPath, sectionsFor } from '@/lib/sections'
 import { Avatar } from './Avatar'
 import { StorageWarning } from './StorageWarning'
 import { usePerson } from './PersonScope'
@@ -10,8 +10,10 @@ export function Layout() {
   const { person, routine, href } = usePerson()
   const { pathname } = useLocation()
 
-  const current = sectionForPath(person.id, pathname)
-  const subPages = current.pages
+  // Built from this person's own list, so nobody sees a discipline they do not do.
+  const sections = sectionsFor(person.sections)
+  const current = sectionForPath(person.id, pathname, sections)
+  const subPages = current?.pages ?? []
 
   return (
     <div className="min-h-full lg:flex">
@@ -47,7 +49,7 @@ export function Layout() {
         </div>
 
         <nav className="flex flex-col gap-5">
-          {SECTIONS.map((section) => (
+          {sections.map((section) => (
             <div key={section.id}>
               {section.pages.length === 0 ? (
                 <SidebarLink to={href(section.landing)} end={section.end} label={section.label} icon={section.icon} />
@@ -61,12 +63,7 @@ export function Layout() {
                   </div>
                   <div className="flex flex-col gap-0.5">
                     {section.pages.map((page) => (
-                      <SidebarLink
-                        key={page.sub}
-                        to={href(page.sub)}
-                        label={page.label}
-                        muted={page.placeholder}
-                      />
+                      <SidebarLink key={page.sub} to={href(page.sub)} label={page.label} />
                     ))}
                   </div>
                 </>
@@ -114,11 +111,7 @@ export function Layout() {
                   className={({ isActive }) =>
                     cn(
                       'shrink-0 rounded-full px-2.5 py-1.5 text-[11px] font-bold transition-colors',
-                      isActive
-                        ? 'bg-accent text-accent-fg'
-                        : page.placeholder
-                          ? 'bg-ink-800 text-chalk-faint'
-                          : 'bg-ink-800 text-chalk-muted',
+                      isActive ? 'bg-accent text-accent-fg' : 'bg-ink-800 text-chalk-muted',
                     )
                   }
                 >
@@ -140,8 +133,8 @@ export function Layout() {
         {/* Mobile bottom tabs: one per section, so three rather than seven */}
         <nav className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t border-ink-600/60 bg-ink-950/92 pt-1.5 backdrop-blur-lg lg:hidden">
           <div className="flex items-stretch justify-around">
-            {SECTIONS.map((section) => {
-              const active = section.id === current.id
+            {sections.map((section) => {
+              const active = section.id === current?.id
               const Icon = section.icon
               return (
                 <Link
@@ -172,13 +165,11 @@ function SidebarLink({
   label,
   icon: Icon,
   end,
-  muted,
 }: {
   to: string
   label: string
   icon?: LucideIcon
   end?: boolean
-  muted?: boolean
 }) {
   return (
     <NavLink
@@ -189,9 +180,7 @@ function SidebarLink({
           'flex items-center gap-3 rounded-2xl px-4 py-2.5 text-sm font-semibold transition-all',
           isActive
             ? 'bg-gradient-to-r from-accent/20 to-accent2/10 text-chalk shadow-inner ring-1 ring-accent/30'
-            : muted
-              ? 'text-chalk-faint hover:bg-ink-700/60 hover:text-chalk-muted'
-              : 'text-chalk-muted hover:bg-ink-700/60 hover:text-chalk',
+            : 'text-chalk-muted hover:bg-ink-700/60 hover:text-chalk',
         )
       }
     >

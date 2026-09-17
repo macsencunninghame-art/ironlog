@@ -83,20 +83,25 @@ labelled with the person's initials too, so it reads without matching colours to
 
 ## Getting around
 
-Inside a person's log the bottom bar carries three tabs rather than the seven it had grown to:
+The bottom bar is built per person, because not everyone trains the same way and nobody should be
+shown a discipline they do not do:
 
-| Tab | Holds |
+| Person | Tabs |
 | --- | --- |
-| Home | Their dashboard |
-| Gym | Log · Routine · Progress · Maxes · History |
-| Training | Running · Hyrox · Tri |
+| Macsy | Home · Gym · Hyrox · Tri |
+| Mitchy | Home · Gym · Running |
+| Mezza | Home · Gym · Hyrox · Running |
+| McGinley | Home · Gym · Tri |
 
-Choosing a tab opens the section's first page and a row of pills for the rest of it, so anything
-is one tap from anywhere. The pills are sized to fit five across a 360px screen and scroll if a
-section ever grows past that. On a desktop the sidebar drops the pills and lists both groups open.
+**Gym** holds Log, Routine, Progress, Maxes and History, and opens with a row of pills for them so
+anything is one tap from anywhere. The pills fit five across a 360px screen and scroll if a section
+ever grows past that. **Running**, **Hyrox** and **Tri** are single pages — Running switches
+between Bronco, Runs and Compare within itself. On a desktop the sidebar drops the pills and lists
+every section open.
 
-Sections are defined in `src/lib/sections.ts` — adding a page is an entry in that list plus a
-route, and the navigation follows.
+`src/lib/sections.ts` is the registry of what each section contains; `sections` on each person in
+`people.ts` decides which of them they get, and in what order. A section someone does not have is
+still reachable by URL — it simply does not light up a tab they do not own.
 
 ## Running
 

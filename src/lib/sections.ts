@@ -1,12 +1,11 @@
-import { Dumbbell, Footprints, LayoutGrid, type LucideIcon } from 'lucide-react'
+import { Bike, Dumbbell, Footprints, LayoutGrid, Zap, type LucideIcon } from 'lucide-react'
 
 /**
- * How a person's section of the app is grouped.
+ * The tabs in a person's section of the app.
  *
- * Everything used to sit in one row of tabs, which reached seven and stopped
- * being scannable. Training splits in two — what you do in the gym, and
- * everything conditioning — so the bar carries three, and each group gets its
- * own row of pills once you are inside it.
+ * Not everyone trains the same way, so the bar is built from the sections that
+ * person actually uses rather than showing every discipline to everybody. The
+ * roster in `people.ts` decides; this file only says what each section contains.
  *
  * Paths are relative to the person; `personPath` turns them absolute.
  */
@@ -14,8 +13,6 @@ import { Dumbbell, Footprints, LayoutGrid, type LucideIcon } from 'lucide-react'
 export interface SectionPage {
   sub: string
   label: string
-  /** Marks a page that exists only to say it has not been built yet. */
-  placeholder?: boolean
 }
 
 export interface Section {
@@ -25,11 +22,12 @@ export interface Section {
   /** Where the tab itself goes. */
   landing: string
   end?: boolean
+  /** Pills shown under the header. Empty when a section is a single page. */
   pages: SectionPage[]
 }
 
-export const SECTIONS: Section[] = [
-  {
+export const SECTIONS: Record<string, Section> = {
+  home: {
     id: 'home',
     label: 'Home',
     icon: LayoutGrid,
@@ -37,7 +35,7 @@ export const SECTIONS: Section[] = [
     end: true,
     pages: [],
   },
-  {
+  gym: {
     id: 'gym',
     label: 'Gym',
     icon: Dumbbell,
@@ -50,23 +48,50 @@ export const SECTIONS: Section[] = [
       { sub: '/history', label: 'History' },
     ],
   },
-  {
-    id: 'training',
-    label: 'Training',
+  running: {
+    id: 'running',
+    label: 'Running',
     icon: Footprints,
     landing: '/running',
-    pages: [
-      { sub: '/running', label: 'Running' },
-      { sub: '/hyrox', label: 'Hyrox', placeholder: true },
-      { sub: '/tri', label: 'Tri', placeholder: true },
-    ],
+    // Bronco, Runs and Compare are switched within the page itself.
+    pages: [],
   },
-]
+  hyrox: {
+    id: 'hyrox',
+    label: 'Hyrox',
+    icon: Zap,
+    landing: '/hyrox',
+    pages: [],
+  },
+  tri: {
+    id: 'tri',
+    label: 'Tri',
+    icon: Bike,
+    landing: '/tri',
+    pages: [],
+  },
+}
 
-/** Which section a path inside a person's area belongs to. */
-export function sectionForPath(personId: string, pathname: string): Section {
+/** The sections this person uses, in the order they appear in the bar. */
+export function sectionsFor(ids: string[]): Section[] {
+  return ids.map((id) => SECTIONS[id]).filter((s): s is Section => Boolean(s))
+}
+
+/**
+ * Which of a person's sections a path belongs to.
+ *
+ * Undefined when the path is not one of theirs - a section someone else uses is
+ * still reachable by URL, it simply does not light up a tab they do not have.
+ */
+export function sectionForPath(
+  personId: string,
+  pathname: string,
+  sections: Section[],
+): Section | undefined {
   const base = `/p/${personId}`
   const rest = pathname.startsWith(base) ? pathname.slice(base.length) : ''
-  const match = SECTIONS.find((s) => s.pages.some((p) => p.sub === rest))
-  return match ?? SECTIONS[0]
+
+  return sections.find(
+    (section) => section.landing === rest || section.pages.some((page) => page.sub === rest),
+  )
 }

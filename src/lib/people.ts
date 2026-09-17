@@ -33,6 +33,12 @@ export interface Person {
   theme: PersonTheme
   /** The days this person trains. */
   routine: RoutineDay[]
+  /**
+   * The tabs in their section of the app, in order, from the registry in
+   * `sections.ts`. Not everyone trains the same way, so nobody is shown a
+   * discipline they do not do.
+   */
+  sections: string[]
 }
 
 export const PEOPLE: Person[] = [
@@ -48,6 +54,7 @@ export const PEOPLE: Person[] = [
       fg: '#FFFFFF',
     },
     routine: FULL_BODY_3,
+    sections: ['home', 'gym', 'hyrox', 'tri'],
   },
   {
     id: 'mitchy',
@@ -62,6 +69,7 @@ export const PEOPLE: Person[] = [
       fg: '#070A12',
     },
     routine: scaledFullBody3(0.75),
+    sections: ['home', 'gym', 'running'],
   },
   {
     id: 'mezza',
@@ -75,6 +83,7 @@ export const PEOPLE: Person[] = [
       fg: '#FFFFFF',
     },
     routine: scaledFullBody3(0.55),
+    sections: ['home', 'gym', 'hyrox', 'running'],
   },
   {
     id: 'mcginley',
@@ -91,6 +100,7 @@ export const PEOPLE: Person[] = [
     },
     // Placeholder starting loads - nothing is known about his numbers yet.
     routine: scaledFullBody3(0.85),
+    sections: ['home', 'gym', 'tri'],
   },
 ]
 
