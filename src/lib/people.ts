@@ -1,4 +1,4 @@
-import { FULL_BODY_3, scaledFullBody3, type RoutineDay } from './routine'
+import { FULL_BODY_3, MITCHY_FULL_BODY, scaledFullBody3, type RoutineDay } from './routine'
 import { getActivePersonId } from './storage'
 
 /**
@@ -68,7 +68,7 @@ export const PEOPLE: Person[] = [
       // Lime is far too bright to carry white text.
       fg: '#070A12',
     },
-    routine: scaledFullBody3(0.75),
+    routine: MITCHY_FULL_BODY,
     sections: ['home', 'gym', 'running'],
   },
   {

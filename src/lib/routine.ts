@@ -26,6 +26,8 @@ export interface RoutineSlot {
   supersetGroup?: string
   /** True when the final prescribed set is a drop set. */
   dropSet?: boolean
+  /** Taken to failure rather than to a count - shown as "Max" and never pre-filled. */
+  amrap?: boolean
   /** Pre-fills the logger the first time only. Never recorded on its own. */
   startWeight: number | null
   startReps: number | null
@@ -71,6 +73,20 @@ export const EXERCISE_GROUPS: Record<string, MuscleGroup> = {
   'chest-supported-row': 'pull',
   'machine-preacher-curls': 'pull',
   'hammer-curls': 'pull',
+  'pull-ups': 'pull',
+  'bodyweight-rows': 'pull',
+  'db-preacher-curls': 'pull',
+  'flat-bench-press': 'push',
+  'push-ups': 'push',
+  'skull-crushers': 'push',
+  'goblet-squats': 'legs',
+  // Knee and leg raises are core, and there is no core group. Unmapped lifts are
+  // left out of the comparison rather than filed under a pattern they are not.
+}
+
+/** "2 x 10", or "3 x Max" for anything taken to failure. */
+export function prescription(slot: RoutineSlot): string {
+  return `${slot.sets} x ${slot.amrap ? 'Max' : slot.reps}`
 }
 
 export function groupOf(exerciseId: string): MuscleGroup | undefined {
@@ -96,6 +112,15 @@ export const EXERCISE_NAMES: Record<string, string> = {
   'incline-barbell-bench-press': 'Incline Barbell Bench Press',
   'chest-supported-row': 'Chest Supported Row Machine',
   'one-legged-rdls': 'One-legged RDLs',
+  'pull-ups': 'Pull Ups',
+  'flat-bench-press': 'Flat Bench Press',
+  'db-preacher-curls': 'DB Preacher Curls',
+  'skull-crushers': 'Skull Crushers',
+  'push-ups': 'Push Ups',
+  'bodyweight-rows': 'Bodyweight Rows',
+  'goblet-squats': 'Goblet Squats',
+  'knee-raises': 'Knee Raises',
+  'lying-leg-raises': 'Lying Leg Raises',
 }
 
 /** Macsy's three-day full body split. */
@@ -403,6 +428,267 @@ export function findSlot(routine: RoutineDay[], exerciseId: string): RoutineSlot
   }
   return undefined
 }
+
+/**
+ * Mitchy's three days.
+ *
+ * Starting weights are placeholders - nobody has told the app what he actually
+ * lifts, so they are only the first pre-fill. After one logged session the
+ * logger fills from what he did last time and these stop mattering.
+ *
+ * Supersets are expressed by rounds: a superset done three times is three sets
+ * of each of its members, sharing a group key.
+ */
+export const MITCHY_FULL_BODY: RoutineDay[] = [
+  {
+    id: 1,
+    name: 'Full Body 1',
+    subtitle: 'Squat / Pull / Incline',
+    slots: [
+      {
+        exerciseId: 'barbell-squats',
+        name: 'BB Squats',
+        sets: 2,
+        reps: 10,
+        warmupSets: 2,
+        bodyweight: false,
+        startWeight: 45,
+        startReps: 10,
+      },
+      {
+        exerciseId: 'pull-ups',
+        name: 'Pull Ups',
+        sets: 2,
+        reps: 8,
+        warmupSets: 0,
+        bodyweight: true,
+        startWeight: null,
+        startReps: 8,
+      },
+      {
+        exerciseId: 'incline-dumbbell-press',
+        name: 'DB Incline Bench',
+        sets: 2,
+        reps: 10,
+        warmupSets: 0,
+        bodyweight: false,
+        startWeight: 25,
+        startReps: 10,
+      },
+      {
+        exerciseId: 'db-preacher-curls',
+        name: 'DB Preacher Curls',
+        sets: 3,
+        reps: 10,
+        warmupSets: 0,
+        bodyweight: false,
+        supersetGroup: 'fb1-arms',
+        startWeight: 15,
+        startReps: 10,
+      },
+      {
+        exerciseId: 'lateral-raises',
+        name: 'Lateral Raises',
+        sets: 3,
+        reps: 10,
+        warmupSets: 0,
+        bodyweight: false,
+        supersetGroup: 'fb1-arms',
+        startWeight: 12,
+        startReps: 10,
+      },
+      {
+        exerciseId: 'skull-crushers',
+        name: 'Skull Crushers',
+        sets: 3,
+        reps: 10,
+        warmupSets: 0,
+        bodyweight: false,
+        supersetGroup: 'fb1-arms',
+        startWeight: 20,
+        startReps: 10,
+      },
+      {
+        exerciseId: 'knee-raises',
+        name: 'Knee Raises',
+        sets: 2,
+        reps: 0,
+        warmupSets: 0,
+        bodyweight: true,
+        amrap: true,
+        supersetGroup: 'fb1-core',
+        startWeight: null,
+        startReps: null,
+      },
+      {
+        exerciseId: 'calf-training',
+        name: 'Calf Raises',
+        sets: 2,
+        reps: 20,
+        warmupSets: 0,
+        bodyweight: true,
+        supersetGroup: 'fb1-core',
+        startWeight: null,
+        startReps: 20,
+      },
+    ],
+  },
+  {
+    id: 2,
+    name: 'Full Body 2',
+    subtitle: 'Bench / Split Squat / Row',
+    slots: [
+      {
+        exerciseId: 'flat-bench-press',
+        name: 'Bench Press',
+        sets: 2,
+        reps: 10,
+        warmupSets: 0,
+        bodyweight: false,
+        startWeight: 50,
+        startReps: 10,
+      },
+      {
+        exerciseId: 'split-squats',
+        name: 'DB Split Squats',
+        sets: 2,
+        reps: 10,
+        warmupSets: 0,
+        bodyweight: false,
+        startWeight: 20,
+        startReps: 10,
+      },
+      {
+        exerciseId: 'chest-supported-row',
+        name: 'Chest Supported BB Row',
+        sets: 2,
+        reps: 10,
+        warmupSets: 0,
+        bodyweight: false,
+        startWeight: 40,
+        startReps: 10,
+      },
+      {
+        exerciseId: 'one-legged-rdls',
+        name: "Single Leg RDL's",
+        sets: 3,
+        reps: 10,
+        warmupSets: 0,
+        bodyweight: false,
+        startWeight: 15,
+        startReps: 10,
+      },
+      {
+        exerciseId: 'db-preacher-curls',
+        name: 'DB Preacher Curls',
+        sets: 3,
+        reps: 10,
+        warmupSets: 0,
+        bodyweight: false,
+        supersetGroup: 'fb2-arms',
+        startWeight: 15,
+        startReps: 10,
+      },
+      {
+        exerciseId: 'lateral-raises',
+        name: 'Lateral Raises',
+        sets: 3,
+        reps: 10,
+        warmupSets: 0,
+        bodyweight: false,
+        supersetGroup: 'fb2-arms',
+        startWeight: 12,
+        startReps: 10,
+      },
+      {
+        exerciseId: 'skull-crushers',
+        name: 'Skull Crushers',
+        sets: 3,
+        reps: 10,
+        warmupSets: 0,
+        bodyweight: false,
+        supersetGroup: 'fb2-arms',
+        startWeight: 20,
+        startReps: 10,
+      },
+    ],
+  },
+  {
+    id: 3,
+    name: 'Quick Full Body 3',
+    subtitle: 'Bodyweight supersets',
+    slots: [
+      {
+        exerciseId: 'push-ups',
+        name: 'Push Ups',
+        sets: 3,
+        reps: 0,
+        warmupSets: 0,
+        bodyweight: true,
+        amrap: true,
+        supersetGroup: 'fb3-upper',
+        startWeight: null,
+        startReps: null,
+      },
+      {
+        exerciseId: 'bodyweight-rows',
+        name: 'Bodyweight Rows',
+        sets: 3,
+        reps: 0,
+        warmupSets: 0,
+        bodyweight: true,
+        amrap: true,
+        supersetGroup: 'fb3-upper',
+        startWeight: null,
+        startReps: null,
+      },
+      {
+        exerciseId: 'goblet-squats',
+        name: 'Goblet Squats',
+        sets: 3,
+        reps: 15,
+        warmupSets: 0,
+        bodyweight: false,
+        supersetGroup: 'fb3-lower',
+        startWeight: 20,
+        startReps: 15,
+      },
+      {
+        exerciseId: 'one-legged-rdls',
+        name: "Single Leg RDL's",
+        sets: 3,
+        reps: 10,
+        warmupSets: 0,
+        bodyweight: false,
+        supersetGroup: 'fb3-lower',
+        startWeight: 15,
+        startReps: 10,
+      },
+      {
+        exerciseId: 'calf-training',
+        name: 'Calf Raises',
+        sets: 3,
+        reps: 20,
+        warmupSets: 0,
+        bodyweight: true,
+        supersetGroup: 'fb3-lower',
+        startWeight: null,
+        startReps: 20,
+      },
+      {
+        exerciseId: 'lying-leg-raises',
+        name: 'Lying Leg Raises',
+        sets: 1,
+        reps: 0,
+        warmupSets: 0,
+        bodyweight: true,
+        amrap: true,
+        startWeight: null,
+        startReps: null,
+      },
+    ],
+  },
+]
 
 /** Nearest sensible plate or stack increment: 2.5 kg on the big lifts, 0.5 kg on the small ones. */
 function roundLoad(kg: number): number {

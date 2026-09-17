@@ -345,7 +345,9 @@ function blankEntry(slot: RoutineSlot, history: Workout[]): LoggedExercise {
     warmupsDone: Array.from({ length: slot.warmupSets }, () => false),
     sets: Array.from({ length: slot.sets }, (_, i) => ({
       weight: slot.bodyweight ? null : weight,
-      reps: reps ?? slot.reps,
+      // A "Max" set starts empty rather than at zero: the prescription is to go to
+      // failure, so there is no number to suggest until they have done it once.
+      reps: reps ?? (slot.amrap ? null : slot.reps),
       done: false,
       isDropSet: Boolean(slot.dropSet) && i === slot.sets - 1,
     })),

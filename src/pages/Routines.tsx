@@ -1,4 +1,5 @@
 import { Flame, Link2, Lock, TrendingDown } from 'lucide-react'
+import { prescription } from '@/lib/routine'
 import { usePerson } from '@/components/PersonScope'
 import { NoRoutine } from '@/components/NoRoutine'
 import { fmtKg } from '@/lib/utils'
@@ -63,7 +64,7 @@ export function Routines() {
 
                   <div className="num mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-semibold text-chalk-muted">
                     <span className="text-accent-soft">
-                      {slot.sets} x {slot.reps}
+                      {prescription(slot)}
                     </span>
                     {slot.startWeight !== null ? (
                       <span>

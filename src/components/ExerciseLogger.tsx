@@ -1,6 +1,6 @@
 import { Flame, Link2, Minus, Plus, TrendingDown, Trophy } from 'lucide-react'
 import type { LoggedExercise, SetEntry } from '@/types'
-import type { RoutineSlot } from '@/lib/routine'
+import { prescription, type RoutineSlot } from '@/lib/routine'
 import { checkPR, type PR } from '@/lib/stats'
 import { cn, fmtKg } from '@/lib/utils'
 import { Badge } from './ui/Badge'
@@ -30,7 +30,12 @@ export function ExerciseLogger({ slot, logged, pr, onChange }: ExerciseLoggerPro
       sets: [
         ...logged.sets,
         // Added sets are never drop sets, so an extra set cannot silently void a PR.
-        { weight: last?.weight ?? slot.startWeight, reps: slot.reps, done: false, isDropSet: false },
+        {
+          weight: last?.weight ?? slot.startWeight,
+          reps: last?.reps ?? (slot.amrap ? null : slot.reps),
+          done: false,
+          isDropSet: false,
+        },
       ],
     })
   }
@@ -57,7 +62,7 @@ export function ExerciseLogger({ slot, logged, pr, onChange }: ExerciseLoggerPro
           <div className="min-w-0">
             <h3 className="truncate text-[15px] font-bold tracking-tight">{slot.name}</h3>
             <p className="num mt-0.5 text-xs font-semibold text-chalk-muted">
-              {slot.sets} x {slot.reps}
+              {prescription(slot)}
               {slot.bodyweight && ' · bodyweight'}
             </p>
           </div>

@@ -30,12 +30,12 @@ The roster is hardcoded in `src/lib/people.ts`, the same way the routines are.
 | Person | Accent | Routine |
 | --- | --- | --- |
 | Macsy | Orange | The 3-day full body split |
-| Mitchy | Lime | The same split, started ~25% lighter |
+| Mitchy | Lime | His own three days (`MITCHY_FULL_BODY`) |
 | Mezza | Pink | The same split, started ~45% lighter |
 | McGinley | Violet | The same split, started ~15% lighter |
 
-Everyone currently trains the same days, from different starting loads — a convenience while the
-app fills out, not an assumption. `scaledFullBody3(factor)` builds the split at someone's own
+Mitchy trains his own three days; the others share the full body split from different starting
+loads — a convenience while the app fills out, not an assumption. `scaledFullBody3(factor)` builds the split at someone's own
 numbers, and anyone can be handed a completely different routine the moment theirs should differ.
 Every screen follows from whatever their routine says, including having none at all.
 
