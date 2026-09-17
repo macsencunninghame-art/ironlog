@@ -1,10 +1,12 @@
 import type {
   BikeEntry,
   BroncoEntry,
+  BikeIntervalEntry,
   IntervalEntry,
   MaxEntry,
   RunEntry,
   SwimEntry,
+  SwimIntervalEntry,
   Workout,
 } from '@/types'
 import { PEOPLE } from './people'
@@ -173,8 +175,62 @@ const BIKES: Adapter<BikeEntry> = {
   }),
 }
 
+const SWIM_INTERVALS: Adapter<SwimIntervalEntry> = {
+  kind: 'swimIntervals',
+  table: 'swim_intervals',
+  toRow: (person_id, i) => ({
+    id: i.id,
+    person_id,
+    date: i.date,
+    distance_m: i.distanceM,
+    reps: i.reps,
+    rest_seconds: i.restSeconds ?? null,
+    note: i.note ?? null,
+  }),
+  fromRow: (r) => ({
+    id: r.id as string,
+    date: new Date(r.date as string).toISOString(),
+    distanceM: Number(r.distance_m),
+    reps: (r.reps ?? []) as SwimIntervalEntry['reps'],
+    restSeconds: r.rest_seconds === null ? undefined : Number(r.rest_seconds),
+    note: (r.note as string | null) ?? undefined,
+  }),
+}
+
+const BIKE_INTERVALS: Adapter<BikeIntervalEntry> = {
+  kind: 'bikeIntervals',
+  table: 'bike_intervals',
+  toRow: (person_id, i) => ({
+    id: i.id,
+    person_id,
+    date: i.date,
+    distance_km: i.distanceKm,
+    reps: i.reps,
+    rest_seconds: i.restSeconds ?? null,
+    note: i.note ?? null,
+  }),
+  fromRow: (r) => ({
+    id: r.id as string,
+    date: new Date(r.date as string).toISOString(),
+    distanceKm: Number(r.distance_km),
+    reps: (r.reps ?? []) as BikeIntervalEntry['reps'],
+    restSeconds: r.rest_seconds === null ? undefined : Number(r.rest_seconds),
+    note: (r.note as string | null) ?? undefined,
+  }),
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ADAPTERS: Adapter<any>[] = [WORKOUTS, MAXES, BRONCOS, RUNS, INTERVALS, SWIMS, BIKES]
+const ADAPTERS: Adapter<any>[] = [
+  WORKOUTS,
+  MAXES,
+  BRONCOS,
+  RUNS,
+  INTERVALS,
+  SWIMS,
+  BIKES,
+  SWIM_INTERVALS,
+  BIKE_INTERVALS,
+]
 
 export interface SyncResult {
   ok: boolean

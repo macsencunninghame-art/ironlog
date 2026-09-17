@@ -1,4 +1,4 @@
-import type { BikeEntry, SwimEntry } from '@/types'
+import type { BikeEntry, BikeIntervalEntry, IntervalRep, SwimEntry, SwimIntervalEntry } from '@/types'
 import { activeKey, readJSON, storageKey, writeJSON } from './storage'
 import { syncSoon } from './sync'
 import { fmtTime } from './running'
@@ -24,6 +24,17 @@ function sortByDate<T extends { date: string }>(rows: T[], newestFirst = true): 
   })
 }
 
+/**
+ * How many sessions each end of the trend gets.
+ *
+ * The two windows must not overlap, or a session counts as both the start and
+ * the end and the comparison collapses to zero - which is what two sessions and
+ * a window of three used to read as, however much faster the second one was.
+ */
+function edgeWindow(length: number, sample: number): number {
+  return Math.max(1, Math.min(sample, Math.floor(length / 2)))
+}
+
 function edgeMean(values: number[], count: number, fromEnd: boolean): number {
   const slice = fromEnd ? values.slice(-count) : values.slice(0, count)
   return slice.reduce((n, v) => n + v, 0) / slice.length
@@ -32,8 +43,9 @@ function edgeMean(values: number[], count: number, fromEnd: boolean): number {
 /** Percent improvement against the person's own start, in whichever direction is better. */
 function improved(chronological: number[], sample: number, lowerIsBetter: boolean): number | null {
   if (chronological.length < 2) return null
-  const first = edgeMean(chronological, sample, false)
-  const last = edgeMean(chronological, sample, true)
+  const window = edgeWindow(chronological.length, sample)
+  const first = edgeMean(chronological, window, false)
+  const last = edgeMean(chronological, window, true)
   if (first <= 0) return null
   return lowerIsBetter ? ((first - last) / first) * 100 : ((last - first) / first) * 100
 }
@@ -137,4 +149,135 @@ export function bikeStats(rows: BikeEntry[]): BikeStats {
     // Speed rises as you improve, so this one is not inverted.
     improvedPct: improved(speeds, 3, false),
   }
+}
+
+// ---------------------------------------------------------------- interval sessions
+//
+// Same shape for both - a rep distance and one time per rep - but read in each
+// discipline's own terms, because the rate that matters differs and the direction
+// of "better" differs with it.
+
+export interface IntervalSummary {
+  reps: number
+  best: number
+  average: number
+  /** Pace or speed, in whatever the discipline is read in. */
+  rate: number
+  /** How much slower the last rep was than the first, as a percentage. */
+  fade: number | null
+}
+
+function summariseReps(reps: IntervalRep[], rate: (average: number) => number): IntervalSummary | null {
+  const times = reps.map((r) => r.seconds).filter((n) => n > 0)
+  if (!times.length) return null
+
+  const average = times.reduce((n, t) => n + t, 0) / times.length
+  const first = times[0]
+  const last = times[times.length - 1]
+
+  return {
+    reps: times.length,
+    best: Math.min(...times),
+    average,
+    rate: rate(average),
+    fade: times.length > 1 && first > 0 ? ((last - first) / first) * 100 : null,
+  }
+}
+
+// ---- swim intervals: seconds per 100 m, lower is better
+
+export function getSwimIntervals(): SwimIntervalEntry[] {
+  const stored = readJSON<SwimIntervalEntry[]>(activeKey('swimIntervals'), [])
+  return Array.isArray(stored) ? sortByDate(stored) : []
+}
+
+export function addSwimInterval(
+  distanceM: number,
+  reps: IntervalRep[],
+  date: Date,
+  restSeconds?: number,
+): SwimIntervalEntry {
+  const entry: SwimIntervalEntry = {
+    id: uid(),
+    date: date.toISOString(),
+    distanceM,
+    reps,
+    restSeconds,
+  }
+  writeJSON(activeKey('swimIntervals'), [...getSwimIntervals(), entry])
+  syncSoon()
+  return entry
+}
+
+export function summariseSwimInterval(entry: SwimIntervalEntry): IntervalSummary | null {
+  if (entry.distanceM <= 0) return null
+  return summariseReps(entry.reps, (average) => (average / entry.distanceM) * 100)
+}
+
+// ---- bike intervals: km/h, higher is better
+
+export function getBikeIntervals(): BikeIntervalEntry[] {
+  const stored = readJSON<BikeIntervalEntry[]>(activeKey('bikeIntervals'), [])
+  return Array.isArray(stored) ? sortByDate(stored) : []
+}
+
+export function addBikeInterval(
+  distanceKm: number,
+  reps: IntervalRep[],
+  date: Date,
+  restSeconds?: number,
+): BikeIntervalEntry {
+  const entry: BikeIntervalEntry = {
+    id: uid(),
+    date: date.toISOString(),
+    distanceKm,
+    reps,
+    restSeconds,
+  }
+  writeJSON(activeKey('bikeIntervals'), [...getBikeIntervals(), entry])
+  syncSoon()
+  return entry
+}
+
+export function summariseBikeInterval(entry: BikeIntervalEntry): IntervalSummary | null {
+  if (entry.distanceKm <= 0) return null
+  return summariseReps(entry.reps, (average) => entry.distanceKm / (average / 3600))
+}
+
+export interface IntervalSessionStats {
+  sessions: number
+  best: number | null
+  /** Percent improvement on the session rate, first three against the last three. */
+  improvedPct: number | null
+}
+
+/** `lowerIsBetter` flips both the "best" pick and the direction of improvement. */
+function sessionStats(rates: number[], bests: number[], lowerIsBetter: boolean): IntervalSessionStats {
+  return {
+    sessions: rates.length,
+    best: bests.length ? (lowerIsBetter ? Math.min(...bests) : Math.max(...bests)) : null,
+    improvedPct: improved(rates, 3, lowerIsBetter),
+  }
+}
+
+export function swimIntervalStats(rows: SwimIntervalEntry[]): IntervalSessionStats {
+  const summaries = sortByDate(rows, false)
+    .map(summariseSwimInterval)
+    .filter((s): s is IntervalSummary => s !== null)
+  return sessionStats(
+    summaries.map((s) => s.rate),
+    summaries.map((s) => s.rate),
+    true,
+  )
+}
+
+export function bikeIntervalStats(rows: BikeIntervalEntry[]): IntervalSessionStats {
+  const summaries = sortByDate(rows, false)
+    .map(summariseBikeInterval)
+    .filter((s): s is IntervalSummary => s !== null)
+  return sessionStats(
+    summaries.map((s) => s.rate),
+    summaries.map((s) => s.rate),
+    false,
+  )
 }

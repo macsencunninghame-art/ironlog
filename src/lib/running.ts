@@ -143,6 +143,11 @@ export function deleteRun(id: string): void {
 
 // ---------------------------------------------------------------- progression
 
+/** The two ends of a trend must not overlap, or a short history compares a session with itself. */
+function edgeWindow(length: number, sample: number): number {
+  return Math.max(1, Math.min(sample, Math.floor(length / 2)))
+}
+
 /** Mean of the first or last few values, to stop one good day defining a trend. */
 function edgeMean(values: number[], count: number, fromEnd: boolean): number {
   const slice = fromEnd ? values.slice(-count) : values.slice(0, count)
@@ -157,8 +162,9 @@ function edgeMean(values: number[], count: number, fromEnd: boolean): number {
  */
 function fasterBy(chronological: number[], sample: number): number | null {
   if (chronological.length < 2) return null
-  const first = edgeMean(chronological, sample, false)
-  const last = edgeMean(chronological, sample, true)
+  const window = edgeWindow(chronological.length, sample)
+  const first = edgeMean(chronological, window, false)
+  const last = edgeMean(chronological, window, true)
   if (first <= 0) return null
   return ((first - last) / first) * 100
 }
@@ -269,8 +275,12 @@ export interface IntervalSummary {
   totalM: number
   best: number
   average: number
-  /** Seconds per kilometre at the average rep. */
-  pace: number
+  /**
+   * The session's pace, in seconds per kilometre. Named `rate` rather than
+   * `pace` because swimming and cycling summarise the same way and one of them
+   * reads as a speed.
+   */
+  rate: number
   /**
    * How much slower the last rep was than the first, as a percentage.
    * Negative means they finished faster than they started.
@@ -292,7 +302,7 @@ export function summarise(entry: IntervalEntry): IntervalSummary | null {
     totalM: entry.distanceM * times.length,
     best: Math.min(...times),
     average,
-    pace: (average / entry.distanceM) * 1000,
+    rate: (average / entry.distanceM) * 1000,
     fade: times.length > 1 && first > 0 ? ((last - first) / first) * 100 : null,
   }
 }
@@ -329,6 +339,6 @@ export function intervalStats(rows: IntervalEntry[]): IntervalStats {
     sessions: rows.length,
     bestRep,
     totalKm: totalM / 1000,
-    improvedPct: fasterBy(summaries.map((x) => x.summary.pace), 3),
+    improvedPct: fasterBy(summaries.map((x) => x.summary.rate), 3),
   }
 }

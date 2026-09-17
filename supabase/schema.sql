@@ -81,6 +81,28 @@ create table if not exists bikes (
   created_at  timestamptz not null default now()
 );
 
+create table if not exists swim_intervals (
+  id           text primary key,
+  person_id    text        not null,
+  date         timestamptz not null,
+  distance_m   numeric     not null,
+  reps         jsonb       not null default '[]'::jsonb,
+  rest_seconds numeric,
+  note         text,
+  created_at   timestamptz not null default now()
+);
+
+create table if not exists bike_intervals (
+  id           text primary key,
+  person_id    text        not null,
+  date         timestamptz not null,
+  distance_km  numeric     not null,
+  reps         jsonb       not null default '[]'::jsonb,
+  rest_seconds numeric,
+  note         text,
+  created_at   timestamptz not null default now()
+);
+
 -- The image itself lives in Storage; this row is how the app finds and describes it.
 create table if not exists photos (
   id          text primary key,
@@ -121,11 +143,14 @@ alter table photos   enable row level security;
 alter table intervals enable row level security;
 alter table swims    enable row level security;
 alter table bikes    enable row level security;
+alter table swim_intervals enable row level security;
+alter table bike_intervals enable row level security;
 
 do $$
 declare t text;
 begin
-  foreach t in array array['workouts', 'maxes', 'broncos', 'runs', 'photos', 'intervals', 'swims', 'bikes'] loop
+  foreach t in array array['workouts', 'maxes', 'broncos', 'runs', 'photos', 'intervals', 'swims', 'bikes',
+                             'swim_intervals', 'bike_intervals'] loop
     execute format('drop policy if exists %I on %I', t || '_read',   t);
     execute format('drop policy if exists %I on %I', t || '_insert', t);
     execute format('drop policy if exists %I on %I', t || '_update', t);

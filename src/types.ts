@@ -95,6 +95,26 @@ export interface IntervalEntry {
   note?: string
 }
 
+/** A swim interval session: a rep distance in metres and one time per rep. */
+export interface SwimIntervalEntry {
+  id: string
+  date: string
+  distanceM: number
+  reps: IntervalRep[]
+  restSeconds?: number
+  note?: string
+}
+
+/** A bike interval session. Kilometres per rep, since 5 km reads better than 5000 m. */
+export interface BikeIntervalEntry {
+  id: string
+  date: string
+  distanceKm: number
+  reps: IntervalRep[]
+  restSeconds?: number
+  note?: string
+}
+
 /** A swim. Metres rather than kilometres, and paced per 100 m. */
 export interface SwimEntry {
   id: string
@@ -127,4 +147,6 @@ export interface IronLogBackup {
   intervals?: IntervalEntry[]
   swims?: SwimEntry[]
   bikes?: BikeEntry[]
+  swimIntervals?: SwimIntervalEntry[]
+  bikeIntervals?: BikeIntervalEntry[]
 }

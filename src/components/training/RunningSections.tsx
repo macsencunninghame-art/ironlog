@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Footprints, Gauge, Repeat, Timer, TrendingDown, X } from 'lucide-react'
+import { Footprints, Gauge, Timer, TrendingDown } from 'lucide-react'
 import type { BroncoEntry, IntervalEntry, RunEntry } from '@/types'
 import {
   addBronco,
@@ -24,6 +24,7 @@ import { Input } from '@/components/ui/Input'
 import { Segmented } from '@/components/ui/Segmented'
 import { LineChart } from '@/components/charts/LineChart'
 import { EntryList, EmptyBlock, MiniStat, SessionForm } from './parts'
+import { IntervalsLog } from './IntervalsLog'
 
 export type RunView = 'bronco' | 'intervals' | 'runs'
 
@@ -212,213 +213,42 @@ function IntervalsView({
   accent: string
   onChange: () => void
 }) {
-  const [distance, setDistance] = useState('')
-  const [rest, setRest] = useState('')
-  const [date, setDate] = useState(() => toDateInputValue(new Date()))
-  const [reps, setReps] = useState<string[]>(['', '', '', ''])
-
   const stats = intervalStats(entries)
-  const distanceM = Number(distance)
-  const repSeconds = reps.map(parseTime)
-  const filled = repSeconds.filter((s): s is number => s !== null)
-  const valid = Number.isFinite(distanceM) && distanceM > 0 && filled.length > 0
-
-  const points = useMemo(
-    () =>
-      [...entries]
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-        .map((e) => ({ entry: e, summary: summarise(e) }))
-        .filter((x) => x.summary !== null)
-        .map((x) => ({
-          date: new Date(x.entry.date),
-          value: x.summary!.pace,
-          detail: `${x.summary!.reps} × ${x.entry.distanceM}m · avg ${fmtTime(x.summary!.average)} · ${fmtDate(x.entry.date)}`,
-        })),
-    [entries],
-  )
-
-  const submit = () => {
-    if (!valid) return
-    addInterval(
-      distanceM,
-      filled.map((seconds) => ({ seconds })),
-      fromDateInputValue(date),
-      parseTime(rest) ?? undefined,
-    )
-    setDistance('')
-    setRest('')
-    setReps(['', '', '', ''])
-    onChange()
-  }
-
-  const setRep = (i: number, value: string) =>
-    setReps((prev) => prev.map((r, n) => (n === i ? value : r)))
 
   return (
-    <div className="space-y-4">
-      <Card className="p-5">
-        <div className="flex items-center gap-2">
-          <Repeat className="h-4 w-4 text-accent" />
-          <h2 className="text-sm font-bold">Log an interval session</h2>
-        </div>
-        <p className="mt-0.5 text-[11px] font-semibold text-chalk-faint">
-          One time per rep.
-        </p>
-
-        <div className="mt-4 flex flex-wrap items-end gap-2">
-          <div className="min-w-[100px] flex-1">
-            <label
-              htmlFor="interval-distance"
-              className="text-[10px] font-black uppercase tracking-widest text-chalk-muted"
-            >
-              Rep distance (m)
-            </label>
-            <Input
-              id="interval-distance"
-              inputMode="numeric"
-              placeholder="400"
-              value={distance}
-              onChange={(e) => setDistance(e.target.value)}
-              className="mt-1"
-            />
-          </div>
-          <div className="min-w-[90px] flex-1">
-            <label
-              htmlFor="interval-rest"
-              className="text-[10px] font-black uppercase tracking-widest text-chalk-muted"
-            >
-              Rest (optional)
-            </label>
-            <Input
-              id="interval-rest"
-              inputMode="numeric"
-              placeholder="1:30"
-              value={rest}
-              onChange={(e) => setRest(e.target.value)}
-              className="mt-1"
-            />
-          </div>
-          <div className="min-w-[140px] flex-1">
-            <label
-              htmlFor="interval-date"
-              className="text-[10px] font-black uppercase tracking-widest text-chalk-muted"
-            >
-              Date
-            </label>
-            <Input
-              id="interval-date"
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="mt-1"
-            />
-          </div>
-        </div>
-
-        <div className="mt-4">
-          <div className="text-[10px] font-black uppercase tracking-widest text-chalk-muted">
-            Rep times
-          </div>
-          <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {reps.map((value, i) => (
-              <div key={i} className="relative">
-                <Input
-                  id={`interval-rep-${i + 1}`}
-                  aria-label={`Rep ${i + 1} time`}
-                  inputMode="numeric"
-                  placeholder={`Rep ${i + 1}`}
-                  value={value}
-                  onChange={(e) => setRep(i, e.target.value)}
-                />
-                {reps.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => setReps((prev) => prev.filter((_, n) => n !== i))}
-                    aria-label={`Remove rep ${i + 1}`}
-                    className="absolute -right-1 -top-1 rounded-full bg-ink-700 p-0.5 text-chalk-faint hover:text-chalk"
-                  >
-                    <X className="h-3 w-3" strokeWidth={3} />
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <Button variant="secondary" size="sm" onClick={() => setReps((prev) => [...prev, ''])}>
-              Add rep
-            </Button>
-            <Button onClick={submit} disabled={!valid}>
-              Save session
-            </Button>
-            {valid && (
-              <span className="num text-[11px] font-bold text-accent">
-                {filled.length} × {distanceM}m · avg{' '}
-                {fmtTime(filled.reduce((n, t) => n + t, 0) / filled.length)}
-              </span>
-            )}
-          </div>
-        </div>
-      </Card>
-
-      <div className="grid grid-cols-3 gap-3">
-        <MiniStat label="Sessions" value={`${stats.sessions}`} />
-        <MiniStat
-          label="Best rep"
-          value={stats.bestRep ? `${fmtTime(stats.bestRep.seconds)}` : '—'}
-          tone="volt"
-        />
-        <MiniStat label="Total" value={`${Number(stats.totalKm.toFixed(1))} km`} />
-      </div>
-      {stats.bestRep && (
-        <p className="-mt-2 px-1 text-[10px] font-semibold text-chalk-faint">
-          Best rep was over {stats.bestRep.distanceM} m.
-        </p>
-      )}
-
-      <Card className="p-5">
-        <div className="mb-1 flex items-center gap-2">
-          <Gauge className="h-4 w-4 text-accent" />
-          <h2 className="text-sm font-bold">Average rep pace</h2>
-        </div>
-        <p className="mb-3 text-[11px] font-semibold text-chalk-faint">
-          Minutes per kilometre across the reps.
-        </p>
-        {points.length >= 2 ? (
-          <LineChart points={points} height={200} color={accent} format={fmtTime} />
-        ) : (
-          <EmptyBlock
-            text={
-              points.length === 1
-                ? 'One more session and this chart has something to plot.'
-                : 'No interval sessions logged yet.'
-            }
-          />
-        )}
-      </Card>
-
-      <EntryList
-        rows={entries.map((e) => {
-          const s = summarise(e)
-          return {
-            id: e.id,
-            primary: s ? `${s.reps} × ${e.distanceM}m` : `${e.distanceM}m`,
-            secondary: s
-              ? `best ${fmtTime(s.best)} · avg ${fmtTime(s.average)}${fadeText(s.fade)} · ${fmtDate(e.date)}`
-              : fmtDate(e.date),
-          }
-        })}
-        emptyText="Nothing logged yet."
-      />
-    </div>
+    <IntervalsLog
+      idPrefix="interval"
+      accent={accent}
+      unit="m"
+      distanceLabel="Rep distance (m)"
+      distancePlaceholder="400"
+      repPlaceholder="1:12"
+      chartTitle="Average rep pace"
+      chartBlurb="Minutes per kilometre across the reps."
+      formatRate={fmtTime}
+      lowerIsBetter
+      rows={entries.map((e) => ({
+        id: e.id,
+        date: e.date,
+        distance: e.distanceM,
+        reps: e.reps,
+        summary: summarise(e),
+      }))}
+      stats={[
+        { label: 'Sessions', value: `${stats.sessions}` },
+        {
+          label: 'Best rep',
+          value: stats.bestRep ? `${fmtTime(stats.bestRep.seconds)}` : '—',
+          tone: 'volt' as const,
+        },
+        { label: 'Total', value: `${Number(stats.totalKm.toFixed(1))} km` },
+      ]}
+      onAdd={(distanceM, reps, date, rest) => {
+        addInterval(distanceM, reps, date, rest)
+        onChange()
+      }}
+    />
   )
-}
-
-/** How the last rep compared with the first, in words rather than a signed number. */
-function fadeText(fade: number | null): string {
-  if (fade === null || Math.abs(fade) < 0.5) return ''
-  const size = Math.abs(fade).toFixed(1)
-  return fade > 0 ? ` · ${size}% slower by the last` : ` · ${size}% faster by the last`
 }
 
 // ------------------------------------------------------------------ Runs

@@ -3,13 +3,21 @@ import { Bike, Gauge, Waves } from 'lucide-react'
 import type { BikeEntry, SwimEntry } from '@/types'
 import {
   addBike,
+  addBikeInterval,
   addSwim,
+  addSwimInterval,
+  bikeIntervalStats,
   bikeSpeed,
   bikeStats,
   fmtSpeed,
   fmtSwimPace,
+  getBikeIntervals,
   getBikes,
+  getSwimIntervals,
   getSwims,
+  summariseBikeInterval,
+  summariseSwimInterval,
+  swimIntervalStats,
   swimPace,
   swimStats,
 } from '@/lib/tri'
@@ -20,6 +28,7 @@ import { Segmented } from '@/components/ui/Segmented'
 import { LineChart } from '@/components/charts/LineChart'
 import { EntryList, EmptyBlock, MiniStat, SessionForm } from '@/components/training/parts'
 import { RunningSections } from '@/components/training/RunningSections'
+import { IntervalsLog } from '@/components/training/IntervalsLog'
 import { fmtDate, fmtSignedPct } from '@/lib/utils'
 
 type Leg = 'swim' | 'bike' | 'run'
@@ -54,14 +63,78 @@ export function Tri() {
         onChange={setLeg}
       />
 
-      {leg === 'swim' && <SwimView accent={person.theme.accent} />}
-      {leg === 'bike' && <BikeView accent={person.theme.accent} />}
+      {leg === 'swim' && <SwimLeg accent={person.theme.accent} />}
+      {leg === 'bike' && <BikeLeg accent={person.theme.accent} />}
       {leg === 'run' && <RunningSections accent={person.theme.accent} compact />}
     </div>
   )
 }
 
 // ------------------------------------------------------------------ swim
+
+type LegView = 'steady' | 'intervals'
+
+function SwimLeg({ accent }: { accent: string }) {
+  const [view, setView] = useState<LegView>('steady')
+  return (
+    <div className="space-y-4">
+      <Segmented
+        className="bg-ink-900/60"
+        options={[
+          { value: 'steady', label: 'Swims' },
+          { value: 'intervals', label: 'Intervals' },
+        ]}
+        value={view}
+        onChange={setView}
+      />
+      {view === 'steady' ? <SwimView accent={accent} /> : <SwimIntervalsView accent={accent} />}
+    </div>
+  )
+}
+
+function SwimIntervalsView({ accent }: { accent: string }) {
+  const [version, setVersion] = useState(0)
+  const entries = useMemo(() => getSwimIntervals(), [version])
+  const stats = swimIntervalStats(entries)
+
+  return (
+    <IntervalsLog
+      idPrefix="swim-interval"
+      accent={accent}
+      unit="m"
+      distanceLabel="Rep distance (m)"
+      distancePlaceholder="100"
+      repPlaceholder="1:35"
+      chartTitle="Average rep pace"
+      chartBlurb="Seconds per 100 m across the reps. Lower is faster."
+      formatRate={fmtTime}
+      lowerIsBetter
+      rows={entries.map((e) => ({
+        id: e.id,
+        date: e.date,
+        distance: e.distanceM,
+        reps: e.reps,
+        summary: summariseSwimInterval(e),
+      }))}
+      stats={[
+        { label: 'Sessions', value: `${stats.sessions}` },
+        {
+          label: 'Best pace',
+          value: stats.best ? fmtTime(stats.best) : '—',
+          tone: 'volt' as const,
+        },
+        {
+          label: 'Faster by',
+          value: stats.improvedPct === null ? '—' : fmtSignedPct(stats.improvedPct),
+        },
+      ]}
+      onAdd={(distanceM, reps, date, rest) => {
+        addSwimInterval(distanceM, reps, date, rest)
+        setVersion((v) => v + 1)
+      }}
+    />
+  )
+}
 
 function SwimView({ accent }: { accent: string }) {
   const [version, setVersion] = useState(0)
@@ -147,6 +220,68 @@ function SwimView({ accent }: { accent: string }) {
 }
 
 // ------------------------------------------------------------------ bike
+
+function BikeLeg({ accent }: { accent: string }) {
+  const [view, setView] = useState<LegView>('steady')
+  return (
+    <div className="space-y-4">
+      <Segmented
+        className="bg-ink-900/60"
+        options={[
+          { value: 'steady', label: 'Rides' },
+          { value: 'intervals', label: 'Intervals' },
+        ]}
+        value={view}
+        onChange={setView}
+      />
+      {view === 'steady' ? <BikeView accent={accent} /> : <BikeIntervalsView accent={accent} />}
+    </div>
+  )
+}
+
+function BikeIntervalsView({ accent }: { accent: string }) {
+  const [version, setVersion] = useState(0)
+  const entries = useMemo(() => getBikeIntervals(), [version])
+  const stats = bikeIntervalStats(entries)
+
+  return (
+    <IntervalsLog
+      idPrefix="bike-interval"
+      accent={accent}
+      unit="km"
+      distanceLabel="Rep distance (km)"
+      distancePlaceholder="5"
+      repPlaceholder="8:30"
+      chartTitle="Average rep speed"
+      chartBlurb="Kilometres per hour across the reps. Higher is faster."
+      formatRate={(v) => `${v.toFixed(1)} km/h`}
+      lowerIsBetter={false}
+      rows={entries.map((e) => ({
+        id: e.id,
+        date: e.date,
+        distance: e.distanceKm,
+        reps: e.reps,
+        summary: summariseBikeInterval(e),
+      }))}
+      stats={[
+        { label: 'Sessions', value: `${stats.sessions}` },
+        {
+          label: 'Best speed',
+          value: stats.best ? fmtSpeed(stats.best) : '—',
+          tone: 'volt' as const,
+        },
+        {
+          label: 'Faster by',
+          value: stats.improvedPct === null ? '—' : fmtSignedPct(stats.improvedPct),
+        },
+      ]}
+      onAdd={(distanceKm, reps, date, rest) => {
+        addBikeInterval(distanceKm, reps, date, rest)
+        setVersion((v) => v + 1)
+      }}
+    />
+  )
+}
 
 function BikeView({ accent }: { accent: string }) {
   const [version, setVersion] = useState(0)

@@ -1,18 +1,20 @@
 import type {
   BikeEntry,
+  BikeIntervalEntry,
   BroncoEntry,
   IntervalEntry,
   IronLogBackup,
   MaxEntry,
   RunEntry,
   SwimEntry,
+  SwimIntervalEntry,
   Workout,
 } from '@/types'
 import { activeKey, getActivePersonId, readJSON, storageKey, writeJSON } from './storage'
 import { readMaxes, writeMaxes } from './maxes'
 import { findPerson } from './people'
 import { getBroncos, getIntervals, getRuns } from './running'
-import { getBikes, getSwims } from './tri'
+import { getBikeIntervals, getBikes, getSwimIntervals, getSwims } from './tri'
 import { syncSoon } from './sync'
 
 /**
@@ -92,6 +94,8 @@ export function buildBackup(): IronLogBackup {
     intervals: getIntervals(),
     swims: getSwims(),
     bikes: getBikes(),
+    swimIntervals: getSwimIntervals(),
+    bikeIntervals: getBikeIntervals(),
   }
 }
 
@@ -189,6 +193,19 @@ export function restoreBackup(raw: string): ImportResult {
       )
     : []
 
+  const swimIntervals = Array.isArray(data.swimIntervals)
+    ? data.swimIntervals.filter(
+        (i): i is SwimIntervalEntry =>
+          !!i && typeof i.id === 'string' && typeof i.distanceM === 'number' && Array.isArray(i.reps),
+      )
+    : []
+  const bikeIntervals = Array.isArray(data.bikeIntervals)
+    ? data.bikeIntervals.filter(
+        (i): i is BikeIntervalEntry =>
+          !!i && typeof i.id === 'string' && typeof i.distanceKm === 'number' && Array.isArray(i.reps),
+      )
+    : []
+
   writeJSON(activeKey('workouts'), workouts)
   writeMaxes(maxes)
   writeJSON(activeKey('broncos'), broncos)
@@ -196,6 +213,8 @@ export function restoreBackup(raw: string): ImportResult {
   writeJSON(activeKey('intervals'), intervals)
   writeJSON(activeKey('swims'), swims)
   writeJSON(activeKey('bikes'), bikes)
+  writeJSON(activeKey('swimIntervals'), swimIntervals)
+  writeJSON(activeKey('bikeIntervals'), bikeIntervals)
 
   const into = activePerson()?.name
   // A file exported by someone else overwrites whoever is logged in now, so say so.
@@ -207,8 +226,10 @@ export function restoreBackup(raw: string): ImportResult {
     message:
       `Restored ${workouts.length} workout${workouts.length === 1 ? '' : 's'}, ` +
       `${maxes.length} max${maxes.length === 1 ? '' : 'es'} and ` +
-      `${broncos.length + runs.length + intervals.length + swims.length + bikes.length} ` +
-      `training entr${broncos.length + runs.length + intervals.length + swims.length + bikes.length === 1 ? 'y' : 'ies'}` +
+      `${broncos.length + runs.length + intervals.length + swims.length + bikes.length +
+    swimIntervals.length + bikeIntervals.length} ` +
+      `training entr${broncos.length + runs.length + intervals.length + swims.length + bikes.length +
+    swimIntervals.length + bikeIntervals.length === 1 ? 'y' : 'ies'}` +
       `${into ? ` into ${into}` : ''}.${crossed}`,
     workouts: workouts.length,
     maxes: maxes.length,

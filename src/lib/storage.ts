@@ -90,6 +90,8 @@ export type DataKind =
   | 'intervals'
   | 'swims'
   | 'bikes'
+  | 'swimIntervals'
+  | 'bikeIntervals'
 
 /** Where one person's data of a given kind lives. */
 export function storageKey(personId: string, kind: DataKind): string {
