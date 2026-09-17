@@ -9,6 +9,7 @@ import type {
 } from '@/types'
 import { PEOPLE } from './people'
 import { readJSON, storageKey, writeJSON, type DataKind } from './storage'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { getSupabase, isShared, PHOTO_BUCKET } from './supabase'
 import { allLocalPhotos, putLocalPhoto, PHOTO_WRITTEN, type Photo } from './photos'
 
@@ -212,14 +213,22 @@ export function syncNow(): Promise<SyncResult> {
 async function run(): Promise<SyncResult> {
   let pulled = 0
   let pushed = 0
+  const failures: string[] = []
 
-  try {
-    const supabase = await getSupabase()
-    if (!supabase) throw new Error('The database client could not be loaded.')
+  const supabase = await getSupabase()
+  if (!supabase) {
+    lastResult = { ok: false, pulled, pushed, error: 'The database client could not be loaded.' }
+    return lastResult
+  }
 
-    for (const adapter of ADAPTERS) {
+  // Each kind is isolated. One table missing or refusing a write used to throw out
+  // of the whole loop, so everything after it - including photos, which run last -
+  // stopped syncing on account of an unrelated problem. Now a failure is recorded
+  // and the rest still runs.
+  for (const adapter of ADAPTERS) {
+    try {
       const { data, error } = await supabase.from(adapter.table).select('*')
-      if (error) throw new Error(`${adapter.table}: ${error.message}`)
+      if (error) throw new Error(error.message)
 
       // Remote rows, grouped by the person they belong to.
       const remote = new Map<string, Map<string, unknown>>()
@@ -255,28 +264,31 @@ async function run(): Promise<SyncResult> {
       }
 
       if (toUpload.length) {
-        const { error: upsertError } = await supabase!
+        const { error: upsertError } = await supabase
           .from(adapter.table)
           .upsert(toUpload, { onConflict: 'id' })
-        if (upsertError) throw new Error(`${adapter.table}: ${upsertError.message}`)
+        if (upsertError) throw new Error(upsertError.message)
         pushed += toUpload.length
       }
-    }
-
-    const photos = await syncPhotos()
-    pulled += photos.pulled
-    pushed += photos.pushed
-
-    lastResult = { ok: true, pulled, pushed }
-  } catch (err) {
-    lastResult = {
-      ok: false,
-      pulled,
-      pushed,
-      error: err instanceof Error ? err.message : 'Sync failed.',
+    } catch (err) {
+      failures.push(`${adapter.table}: ${err instanceof Error ? err.message : 'failed'}`)
     }
   }
 
+  try {
+    const photos = await syncPhotos(supabase)
+    pulled += photos.pulled
+    pushed += photos.pushed
+  } catch (err) {
+    failures.push(`photos: ${err instanceof Error ? err.message : 'failed'}`)
+  }
+
+  lastResult = {
+    ok: failures.length === 0,
+    pulled,
+    pushed,
+    error: failures.length ? failures.join(' · ') : undefined,
+  }
   return lastResult
 }
 
@@ -289,10 +301,9 @@ async function run(): Promise<SyncResult> {
  * time: a phone catching up on a month of everyone's photos should trickle in
  * the background, not saturate the connection.
  */
-async function syncPhotos(): Promise<{ pulled: number; pushed: number }> {
-  const supabase = await getSupabase()
-  if (!supabase) return { pulled: 0, pushed: 0 }
-
+async function syncPhotos(
+  supabase: SupabaseClient,
+): Promise<{ pulled: number; pushed: number }> {
   const { data, error } = await supabase.from('photos').select('*')
   if (error) throw new Error(`photos: ${error.message}`)
 
