@@ -173,7 +173,7 @@ function BroncoView({
           <h2 className="text-sm font-bold">Bronco times</h2>
         </div>
         <p className="mb-3 text-[11px] font-semibold text-chalk-faint">
-          A line heading down is a line heading the right way.
+          Lower is faster.
         </p>
         {points.length >= 2 ? (
           <LineChart points={points} height={200} color={accent} format={fmtTime} />
@@ -181,7 +181,7 @@ function BroncoView({
           <EmptyBlock
             text={
               points.length === 1
-                ? 'One more test and this chart comes alive.'
+                ? 'One more test and this chart has something to plot.'
                 : 'No Broncos logged yet.'
             }
           />
@@ -262,7 +262,7 @@ function IntervalsView({
           <h2 className="text-sm font-bold">Log an interval session</h2>
         </div>
         <p className="mt-0.5 text-[11px] font-semibold text-chalk-faint">
-          One time per rep. Everything else — best, average, pace, fade — comes from them.
+          One time per rep.
         </p>
 
         <div className="mt-4 flex flex-wrap items-end gap-2">
@@ -382,8 +382,7 @@ function IntervalsView({
           <h2 className="text-sm font-bold">Average rep pace</h2>
         </div>
         <p className="mb-3 text-[11px] font-semibold text-chalk-faint">
-          Minutes per kilometre across the reps. Rep distance moves between sessions, so read it
-          alongside what each one was.
+          Minutes per kilometre across the reps.
         </p>
         {points.length >= 2 ? (
           <LineChart points={points} height={200} color={accent} format={fmtTime} />
@@ -391,7 +390,7 @@ function IntervalsView({
           <EmptyBlock
             text={
               points.length === 1
-                ? 'One more session and this chart comes alive.'
+                ? 'One more session and this chart has something to plot.'
                 : 'No interval sessions logged yet.'
             }
           />
@@ -453,7 +452,7 @@ function RunsView({
       <SessionForm
         idPrefix="run"
         title="Log a run"
-        blurb="Pace is worked out from these two, never stored separately."
+        blurb="Distance and time. Pace is derived."
         icon={<Footprints className="h-4 w-4 text-accent" />}
         distanceLabel="Distance (km)"
         distancePlaceholder="5"
@@ -481,8 +480,7 @@ function RunsView({
           <h2 className="text-sm font-bold">Pace</h2>
         </div>
         <p className="mb-3 text-[11px] font-semibold text-chalk-faint">
-          Minutes per kilometre. Lower is faster — and pace moves with distance, so read it
-          alongside how far each run was.
+          Minutes per kilometre. Lower is faster.
         </p>
         {points.length >= 2 ? (
           <LineChart points={points} height={200} color={accent} format={fmtTime} />
@@ -490,7 +488,7 @@ function RunsView({
           <EmptyBlock
             text={
               points.length === 1
-                ? 'One more run and this chart comes alive.'
+                ? 'One more run and this chart has something to plot.'
                 : 'No runs logged yet.'
             }
           />

@@ -15,7 +15,7 @@ export function Running() {
       <div>
         <h1 className="text-2xl font-black tracking-tight">Running</h1>
         <p className="mt-0.5 text-sm text-chalk-muted">
-          Broncos, intervals and runs. Log any of them on any day — here, faster is better.
+          Broncos, intervals and runs. Any of them, on any day.
         </p>
       </div>
 

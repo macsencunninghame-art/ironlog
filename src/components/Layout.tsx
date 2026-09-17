@@ -74,8 +74,6 @@ export function Layout() {
 
         <div className="mt-auto pt-8 text-[11px] leading-relaxed text-chalk-faint">
           All weights in kilograms.
-          <br />
-          Each person&apos;s routine and log are their own.
         </div>
       </aside>
 

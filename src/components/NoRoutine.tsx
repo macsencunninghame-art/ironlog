@@ -16,9 +16,9 @@ export function NoRoutine({ name, action }: { name: string; action: string }) {
       <div>
         <h2 className="text-base font-black tracking-tight">No routine yet</h2>
         <p className="mx-auto mt-1.5 max-w-sm text-xs leading-relaxed text-chalk-muted">
-          {name} has no training days set up, so there is nothing to {action}. Routines are fixed
-          in the source: add one to <code className="text-chalk-faint">src/lib/routine.ts</code> and
-          assign it in <code className="text-chalk-faint">src/lib/people.ts</code>.
+          {name} has no training days set up, so there is nothing to {action}. Routines are set
+          in <code className="text-chalk-faint">src/lib/routine.ts</code> and assigned in{' '}
+          <code className="text-chalk-faint">src/lib/people.ts</code>.
         </p>
       </div>
     </Card>

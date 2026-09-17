@@ -40,7 +40,7 @@ export function Tri() {
       <div>
         <h1 className="text-2xl font-black tracking-tight">Tri</h1>
         <p className="mt-0.5 text-sm text-chalk-muted">
-          Swim, bike and run. Log any leg on any day.
+          Swim, bike and run. Any leg, on any day.
         </p>
       </div>
 
@@ -86,7 +86,7 @@ function SwimView({ accent }: { accent: string }) {
       <SessionForm
         idPrefix="swim"
         title="Log a swim"
-        blurb="Pace is per 100 m, the way swimming is always read."
+        blurb="Pace is per 100 m."
         icon={<Waves className="h-4 w-4 text-accent" />}
         distanceLabel="Distance (m)"
         distancePlaceholder="1500"
@@ -127,7 +127,7 @@ function SwimView({ accent }: { accent: string }) {
           <EmptyBlock
             text={
               points.length === 1
-                ? 'One more swim and this chart comes alive.'
+                ? 'One more swim and this chart has something to plot.'
                 : 'No swims logged yet.'
             }
           />
@@ -171,7 +171,7 @@ function BikeView({ accent }: { accent: string }) {
       <SessionForm
         idPrefix="bike"
         title="Log a ride"
-        blurb="Read as speed rather than pace — on the bike, a bigger number is the fast one."
+        blurb="Speed in km/h, not pace."
         icon={<Bike className="h-4 w-4 text-accent" />}
         distanceLabel="Distance (km)"
         distancePlaceholder="40"
@@ -199,7 +199,7 @@ function BikeView({ accent }: { accent: string }) {
           <h2 className="text-sm font-bold">Speed</h2>
         </div>
         <p className="mb-3 text-[11px] font-semibold text-chalk-faint">
-          Kilometres per hour. Higher is faster — the one chart here that wants to climb.
+          Kilometres per hour. Higher is faster.
           {stats.improvedPct !== null && (
             <span className="ml-1 text-chalk-muted">
               {fmtSignedPct(stats.improvedPct)} against your first rides.
@@ -217,7 +217,7 @@ function BikeView({ accent }: { accent: string }) {
           <EmptyBlock
             text={
               points.length === 1
-                ? 'One more ride and this chart comes alive.'
+                ? 'One more ride and this chart has something to plot.'
                 : 'No rides logged yet.'
             }
           />

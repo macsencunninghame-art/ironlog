@@ -50,9 +50,8 @@ export function RunningCompare({ currentPersonId }: { currentPersonId: string })
     <div className="space-y-4">
       <Card className="p-4">
         <p className="text-[11px] leading-relaxed text-chalk-muted">
-          As with lifting, everyone is measured against <strong className="text-chalk">their own</strong>{' '}
-          starting numbers — being quicker is not the same as improving. A positive figure always
-          means faster, on both the Bronco and on pace.
+          Everyone is measured against their own starting numbers. A positive figure means
+          faster, on both the Bronco and on pace.
         </p>
       </Card>
 

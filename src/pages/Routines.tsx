@@ -33,7 +33,7 @@ export function Routines() {
       <div className="flex items-center gap-2 rounded-2xl border border-ink-600 bg-ink-800/50 px-4 py-3">
         <Lock className="h-4 w-4 shrink-0 text-chalk-faint" />
         <p className="text-xs font-medium text-chalk-muted">
-          Fixed by design. The routine lives in the source and cannot be changed from inside the app.
+          Routines are set in the source and cannot be changed from inside the app.
         </p>
       </div>
 

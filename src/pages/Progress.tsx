@@ -55,7 +55,7 @@ export function Progress() {
     <div className="space-y-5">
       <div>
         <h1 className="text-2xl font-black tracking-tight">Progress</h1>
-        <p className="mt-0.5 text-sm text-chalk-muted">Every number here is one you lifted.</p>
+        <p className="mt-0.5 text-sm text-chalk-muted">Charts from your logged sessions.</p>
       </div>
 
       <Segmented

@@ -39,7 +39,7 @@ export function CompareChart({ className, bare = false }: CompareChartProps) {
       {!bare && (
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-sm font-bold">Who&apos;s improving</h2>
+            <h2 className="text-sm font-bold">Progression</h2>
             <p className="mt-0.5 text-[11px] font-semibold text-chalk-faint">
               Change against each person&apos;s own starting numbers
             </p>

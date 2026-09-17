@@ -62,7 +62,7 @@ export function LatestPhotos({ className, bare = false }: LatestPhotosProps) {
         <>
           <h2 className="text-sm font-bold">Latest photos</h2>
           <p className="mt-0.5 text-[11px] font-semibold text-chalk-faint">
-            The most recent shot from each person — tap the camera to add one
+            Most recent photo from each person.
           </p>
         </>
       )}

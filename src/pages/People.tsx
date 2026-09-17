@@ -13,21 +13,12 @@ import { relativeDay } from '@/lib/utils'
 
 type Tab = 'train' | 'photos' | 'progress'
 
-const HEADINGS: Record<Tab, { title: string; accentWord: string; subtitle: string }> = {
-  train: {
-    title: "Who's",
-    accentWord: 'lifting',
-    subtitle: 'Own routine, own log, own numbers.',
-  },
-  photos: {
-    title: 'Latest',
-    accentWord: 'photos',
-    subtitle: 'The most recent shot from everyone. Tap a camera to add one.',
-  },
+const HEADINGS: Record<Tab, { title: string; subtitle: string }> = {
+  train: { title: 'People', subtitle: 'Pick a person to open their log.' },
+  photos: { title: 'Photos', subtitle: 'Most recent photo from each person.' },
   progress: {
-    title: "Who's",
-    accentWord: 'improving',
-    subtitle: 'Measured against each person’s own starting numbers.',
+    title: 'Progress',
+    subtitle: 'Change against each person’s own starting numbers.',
   },
 }
 
@@ -63,10 +54,7 @@ export function People() {
 
         <StorageWarning className="mb-5" />
 
-        <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
-          {heading.title} <span className="text-gradient-accent">{heading.accentWord}</span>
-          {tab === 'train' ? '?' : ''}
-        </h1>
+        <h1 className="text-3xl font-black tracking-tight sm:text-4xl">{heading.title}</h1>
         <p className="mt-1.5 text-sm text-chalk-muted">{heading.subtitle}</p>
 
         <Segmented

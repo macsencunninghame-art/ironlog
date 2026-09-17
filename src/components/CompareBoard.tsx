@@ -22,10 +22,9 @@ export function CompareBoard({ currentPersonId }: { currentPersonId: string }) {
       <Card className="flex items-start gap-3 p-4">
         <Info className="mt-0.5 h-4 w-4 shrink-0 text-chalk-faint" />
         <p className="text-[11px] leading-relaxed text-chalk-muted">
-          Everyone is measured against <strong className="text-chalk">their own</strong> starting
-          numbers, so being stronger is not the same as improving. Each lift is compared from the
-          first session it appears in to the most recent, and those are averaged by movement
-          pattern — you do not need to be doing the same exercises to compare.
+          Each lift is compared from the first session it appears in to the most recent, and
+          those ratios are averaged by movement pattern. Everyone is measured against their own
+          starting numbers, so the same exercises are not required.
         </p>
       </Card>
 

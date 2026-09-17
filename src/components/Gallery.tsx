@@ -89,8 +89,8 @@ export function Gallery({ personId, personName, routine }: GalleryProps) {
         </div>
 
         <p className="mt-3 text-[11px] leading-relaxed text-chalk-muted">
-          Photos are resized on the way in and shared with everyone else on IronLog. They are
-          not part of the History backup file, which stays a copy of the training log alone.
+          Photos are resized on the way in and shared with everyone. They are not part of the
+          History backup file.
           {photosAreEphemeral() && (
             <span className="mt-1 block text-amber-200">
               This browser is blocking photo storage, so these will be gone when you close the tab.

@@ -91,7 +91,7 @@ export function Dashboard() {
 
         <div className="relative">
           <p className="text-[11px] font-bold uppercase tracking-widest text-accent">
-            {workouts.length ? 'Up next' : `Welcome to IronLog, ${person.name}`}
+            {workouts.length ? 'Up next' : 'First session'}
           </p>
           <h1 className="mt-2 text-3xl font-black leading-tight tracking-tight sm:text-4xl">
             Day {suggestedDay.id}
@@ -178,8 +178,8 @@ export function Dashboard() {
             icon={TrendingUp}
             text={
               series.length === 1
-                ? 'One more session and this chart comes alive.'
-                : 'Log a workout to start your first chart.'
+                ? 'One more session and this chart has something to plot.'
+                : 'No sessions logged yet.'
             }
           />
         )}
@@ -227,7 +227,7 @@ export function Dashboard() {
             })}
           </div>
         ) : (
-          <EmptyBlock icon={Activity} text="Nothing logged yet. Your first session starts the record." />
+          <EmptyBlock icon={Activity} text="Nothing logged yet." />
         )}
       </Card>
     </div>
