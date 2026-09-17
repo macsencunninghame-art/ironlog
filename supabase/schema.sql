@@ -48,6 +48,39 @@ create table if not exists runs (
   created_at  timestamptz not null default now()
 );
 
+-- Interval sessions. The reps stay as JSON: they are written and read whole, and
+-- every figure shown (best rep, average, pace, fade) is worked out from them.
+create table if not exists intervals (
+  id           text primary key,
+  person_id    text        not null,
+  date         timestamptz not null,
+  distance_m   numeric     not null,
+  reps         jsonb       not null default '[]'::jsonb,
+  rest_seconds numeric,
+  note         text,
+  created_at   timestamptz not null default now()
+);
+
+create table if not exists swims (
+  id          text primary key,
+  person_id   text        not null,
+  date        timestamptz not null,
+  distance_m  numeric     not null,
+  seconds     numeric     not null,
+  note        text,
+  created_at  timestamptz not null default now()
+);
+
+create table if not exists bikes (
+  id          text primary key,
+  person_id   text        not null,
+  date        timestamptz not null,
+  distance_km numeric     not null,
+  seconds     numeric     not null,
+  note        text,
+  created_at  timestamptz not null default now()
+);
+
 -- The image itself lives in Storage; this row is how the app finds and describes it.
 create table if not exists photos (
   id          text primary key,
@@ -65,6 +98,9 @@ create index if not exists maxes_person_idx         on maxes    (person_id, lift
 create index if not exists broncos_person_date_idx  on broncos  (person_id, date desc);
 create index if not exists runs_person_date_idx     on runs     (person_id, date desc);
 create index if not exists photos_person_date_idx   on photos   (person_id, date desc);
+create index if not exists intervals_person_date_idx on intervals (person_id, date desc);
+create index if not exists swims_person_date_idx    on swims    (person_id, date desc);
+create index if not exists bikes_person_date_idx    on bikes    (person_id, date desc);
 
 -- ---------------------------------------------------------------- access rules
 --
@@ -82,11 +118,14 @@ alter table maxes    enable row level security;
 alter table broncos  enable row level security;
 alter table runs     enable row level security;
 alter table photos   enable row level security;
+alter table intervals enable row level security;
+alter table swims    enable row level security;
+alter table bikes    enable row level security;
 
 do $$
 declare t text;
 begin
-  foreach t in array array['workouts', 'maxes', 'broncos', 'runs', 'photos'] loop
+  foreach t in array array['workouts', 'maxes', 'broncos', 'runs', 'photos', 'intervals', 'swims', 'bikes'] loop
     execute format('drop policy if exists %I on %I', t || '_read',   t);
     execute format('drop policy if exists %I on %I', t || '_insert', t);
     execute format('drop policy if exists %I on %I', t || '_update', t);

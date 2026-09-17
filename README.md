@@ -108,14 +108,32 @@ still reachable by URL — it simply does not light up a tab they do not own.
 Running is deliberately kept out of the lifting log: a Bronco time and a run pace both improve by
 going *down*, and letting them near volume or PR detection would quietly corrupt both.
 
+Three ways to log it, and **none is tied to a day of the week** — every entry carries its own
+date, so any of them can be recorded on any day, including after the fact:
+
 - **Bronco** — 5 × (20-40-60 m shuttles), 1200 m against the clock. One time per test; the chart
   wants to head downwards. Improvement is the first test against the latest.
-- **Runs** — distance and time. Pace is derived from those two and never stored, so it cannot
-  disagree with the numbers behind it. Improvement averages the first three runs against the last
-  three, because pace swings with distance and terrain and a single first run is a poor baseline.
-- **Compare** — the same principle as lifting: everyone against their own starting point, so the
-  quickest person is not automatically the one improving most. A positive figure always means
-  faster.
+- **Intervals** — a rep distance and one time per rep. Best, average, pace and how much you faded
+  are all worked out from the reps and never stored, so a summary can never disagree with them.
+  Progression tracks average rep pace, averaged over three sessions at each end.
+- **Runs** — distance and time. Pace is derived from those two and never stored separately.
+  Improvement averages the first three runs against the last three, because pace swings with
+  distance and a single first run is a poor baseline.
+
+**Compare** applies the same principle as lifting: everyone against their own starting point, so
+the quickest person is not automatically the one improving most.
+
+## Tri
+
+Swim, bike and run, each logged on any day.
+
+- **Swim** — metres, paced per 100 m. Lower is faster.
+- **Bike** — kilometres, read as **speed in km/h**. This is the one figure in the app where a
+  bigger number is the better one, so the improvement maths is deliberately not inverted with the
+  rest.
+- **Run** — not a separate log. It reuses the running sections whole, reading and writing the same
+  Broncos, intervals and runs as the Running tab. A run is a run; splitting the log by which tab
+  someone happened to open would make both halves wrong.
 
 Times are entered as `5:42` or `1:05:30`. Anything that is not a time is refused rather than
 guessed at, and only the leading unit may pass 59 — `90:00` is a legitimate ninety minutes.

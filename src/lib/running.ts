@@ -1,4 +1,4 @@
-import type { BroncoEntry, RunEntry } from '@/types'
+import type { BroncoEntry, IntervalEntry, IntervalRep, RunEntry } from '@/types'
 import { activeKey, readJSON, storageKey, writeJSON } from './storage'
 import { PEOPLE, type Person } from './people'
 import { uid } from './utils'
@@ -229,4 +229,106 @@ export function runningForEveryone(): RunningProgress[] {
     bronco: broncoStats(getBroncosFor(person.id)),
     run: runStats(getRunsFor(person.id)),
   }))
+}
+
+// ---------------------------------------------------------------- intervals
+
+export function getIntervals(): IntervalEntry[] {
+  const stored = readJSON<IntervalEntry[]>(activeKey('intervals'), [])
+  return Array.isArray(stored) ? sortByDate(stored) : []
+}
+
+export function getIntervalsFor(personId: string): IntervalEntry[] {
+  const stored = readJSON<IntervalEntry[]>(storageKey(personId, 'intervals'), [])
+  return Array.isArray(stored) ? sortByDate(stored) : []
+}
+
+export function addInterval(
+  distanceM: number,
+  reps: IntervalRep[],
+  date: Date,
+  restSeconds?: number,
+  note?: string,
+): IntervalEntry {
+  const entry: IntervalEntry = {
+    id: uid(),
+    date: date.toISOString(),
+    distanceM,
+    reps,
+    restSeconds,
+    note,
+  }
+  writeJSON(activeKey('intervals'), [...getIntervals(), entry])
+  syncSoon()
+  return entry
+}
+
+export interface IntervalSummary {
+  reps: number
+  /** Metres covered in the working reps, ignoring recovery. */
+  totalM: number
+  best: number
+  average: number
+  /** Seconds per kilometre at the average rep. */
+  pace: number
+  /**
+   * How much slower the last rep was than the first, as a percentage.
+   * Negative means they finished faster than they started.
+   */
+  fade: number | null
+}
+
+export function summarise(entry: IntervalEntry): IntervalSummary | null {
+  const times = entry.reps.map((r) => r.seconds).filter((n) => n > 0)
+  if (!times.length || entry.distanceM <= 0) return null
+
+  const total = times.reduce((n, t) => n + t, 0)
+  const average = total / times.length
+  const first = times[0]
+  const last = times[times.length - 1]
+
+  return {
+    reps: times.length,
+    totalM: entry.distanceM * times.length,
+    best: Math.min(...times),
+    average,
+    pace: (average / entry.distanceM) * 1000,
+    fade: times.length > 1 && first > 0 ? ((last - first) / first) * 100 : null,
+  }
+}
+
+export interface IntervalStats {
+  sessions: number
+  /** Quickest single rep at the most recently used distance. */
+  bestRep: { seconds: number; distanceM: number } | null
+  totalKm: number
+  /** Percent faster on average rep pace, first three sessions against the last three. */
+  improvedPct: number | null
+}
+
+export function intervalStats(rows: IntervalEntry[]): IntervalStats {
+  if (!rows.length) return { sessions: 0, bestRep: null, totalKm: 0, improvedPct: null }
+
+  const chronological = sortByDate(rows, false)
+  const summaries = chronological
+    .map((e) => ({ entry: e, summary: summarise(e) }))
+    .filter((x): x is { entry: IntervalEntry; summary: IntervalSummary } => x.summary !== null)
+
+  // The fastest single rep, carrying its distance. Comparing a 200 against a 400
+  // would be meaningless, so the figure is always shown with what it was run over
+  // rather than pretending one number ranks them all.
+  let bestRep: IntervalStats['bestRep'] = null
+  let totalM = 0
+  for (const { entry, summary } of summaries) {
+    totalM += summary.totalM
+    const betterPace = !bestRep || summary.best / entry.distanceM < bestRep.seconds / bestRep.distanceM
+    if (betterPace) bestRep = { seconds: summary.best, distanceM: entry.distanceM }
+  }
+
+  return {
+    sessions: rows.length,
+    bestRep,
+    totalKm: totalM / 1000,
+    improvedPct: fasterBy(summaries.map((x) => x.summary.pace), 3),
+  }
 }

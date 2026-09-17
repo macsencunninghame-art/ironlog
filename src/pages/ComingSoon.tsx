@@ -50,14 +50,3 @@ export function Hyrox() {
     />
   )
 }
-
-export function Tri() {
-  return (
-    <ComingSoon
-      title="Tri"
-      needs="Nothing is recorded here yet. Swim, bike and run each want their own distance and time,
-        and brick sessions and full races want something different again — say how you train and
-        this can be built around it."
-    />
-  )
-}

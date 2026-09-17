@@ -71,6 +71,48 @@ export interface RunEntry {
   source?: 'manual' | 'strava'
 }
 
+/**
+ * One rep of an interval session: how far, and how long it took.
+ * Distance is per rep, so 6 x 400 m is six of these.
+ */
+export interface IntervalRep {
+  seconds: number
+}
+
+/**
+ * An interval session. The reps carry the detail; everything shown - best rep,
+ * average, pace, how much they faded - is worked out from them, never stored,
+ * so a summary can never disagree with the reps behind it.
+ */
+export interface IntervalEntry {
+  id: string
+  date: string
+  /** Distance of a single rep, in metres. */
+  distanceM: number
+  reps: IntervalRep[]
+  /** Recovery between reps, in seconds. Optional - plenty of sessions are by feel. */
+  restSeconds?: number
+  note?: string
+}
+
+/** A swim. Metres rather than kilometres, and paced per 100 m. */
+export interface SwimEntry {
+  id: string
+  date: string
+  distanceM: number
+  seconds: number
+  note?: string
+}
+
+/** A ride. Kilometres, and read as speed rather than pace - here faster is a bigger number. */
+export interface BikeEntry {
+  id: string
+  date: string
+  distanceKm: number
+  seconds: number
+  note?: string
+}
+
 export interface IronLogBackup {
   app: 'ironlog'
   version: 1
@@ -82,4 +124,7 @@ export interface IronLogBackup {
   /** Optional so backups taken before running was tracked still import. */
   broncos?: BroncoEntry[]
   runs?: RunEntry[]
+  intervals?: IntervalEntry[]
+  swims?: SwimEntry[]
+  bikes?: BikeEntry[]
 }

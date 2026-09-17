@@ -7,7 +7,8 @@ import { Routines } from './pages/Routines'
 import { Progress } from './pages/Progress'
 import { Maxes } from './pages/Maxes'
 import { Running } from './pages/Running'
-import { Hyrox, Tri } from './pages/ComingSoon'
+import { Hyrox } from './pages/ComingSoon'
+import { Tri } from './pages/Tri'
 import { HistoryPage } from './pages/History'
 
 export default function App() {

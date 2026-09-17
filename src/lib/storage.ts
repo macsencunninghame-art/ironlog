@@ -82,7 +82,14 @@ function hasKey(key: string): boolean {
   return rawGet(key) !== null
 }
 
-export type DataKind = 'workouts' | 'maxes' | 'broncos' | 'runs'
+export type DataKind =
+  | 'workouts'
+  | 'maxes'
+  | 'broncos'
+  | 'runs'
+  | 'intervals'
+  | 'swims'
+  | 'bikes'
 
 /** Where one person's data of a given kind lives. */
 export function storageKey(personId: string, kind: DataKind): string {

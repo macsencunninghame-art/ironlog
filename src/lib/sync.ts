@@ -1,4 +1,12 @@
-import type { BroncoEntry, MaxEntry, RunEntry, Workout } from '@/types'
+import type {
+  BikeEntry,
+  BroncoEntry,
+  IntervalEntry,
+  MaxEntry,
+  RunEntry,
+  SwimEntry,
+  Workout,
+} from '@/types'
 import { PEOPLE } from './people'
 import { readJSON, storageKey, writeJSON, type DataKind } from './storage'
 import { getSupabase, isShared, PHOTO_BUCKET } from './supabase'
@@ -102,8 +110,70 @@ const RUNS: Adapter<RunEntry> = {
   }),
 }
 
+const INTERVALS: Adapter<IntervalEntry> = {
+  kind: 'intervals',
+  table: 'intervals',
+  toRow: (person_id, i) => ({
+    id: i.id,
+    person_id,
+    date: i.date,
+    distance_m: i.distanceM,
+    reps: i.reps,
+    rest_seconds: i.restSeconds ?? null,
+    note: i.note ?? null,
+  }),
+  fromRow: (r) => ({
+    id: r.id as string,
+    date: new Date(r.date as string).toISOString(),
+    distanceM: Number(r.distance_m),
+    reps: (r.reps ?? []) as IntervalEntry['reps'],
+    restSeconds: r.rest_seconds === null ? undefined : Number(r.rest_seconds),
+    note: (r.note as string | null) ?? undefined,
+  }),
+}
+
+const SWIMS: Adapter<SwimEntry> = {
+  kind: 'swims',
+  table: 'swims',
+  toRow: (person_id, w) => ({
+    id: w.id,
+    person_id,
+    date: w.date,
+    distance_m: w.distanceM,
+    seconds: w.seconds,
+    note: w.note ?? null,
+  }),
+  fromRow: (r) => ({
+    id: r.id as string,
+    date: new Date(r.date as string).toISOString(),
+    distanceM: Number(r.distance_m),
+    seconds: Number(r.seconds),
+    note: (r.note as string | null) ?? undefined,
+  }),
+}
+
+const BIKES: Adapter<BikeEntry> = {
+  kind: 'bikes',
+  table: 'bikes',
+  toRow: (person_id, b) => ({
+    id: b.id,
+    person_id,
+    date: b.date,
+    distance_km: b.distanceKm,
+    seconds: b.seconds,
+    note: b.note ?? null,
+  }),
+  fromRow: (r) => ({
+    id: r.id as string,
+    date: new Date(r.date as string).toISOString(),
+    distanceKm: Number(r.distance_km),
+    seconds: Number(r.seconds),
+    note: (r.note as string | null) ?? undefined,
+  }),
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ADAPTERS: Adapter<any>[] = [WORKOUTS, MAXES, BRONCOS, RUNS]
+const ADAPTERS: Adapter<any>[] = [WORKOUTS, MAXES, BRONCOS, RUNS, INTERVALS, SWIMS, BIKES]
 
 export interface SyncResult {
   ok: boolean
