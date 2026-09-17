@@ -66,12 +66,16 @@ export function Routines() {
                     <span className="text-accent-soft">
                       {prescription(slot)}
                     </span>
-                    {slot.startWeight !== null ? (
+                    {/* Bodyweight is its own flag. A weighted lift with no starting
+                        number is simply one nobody has done yet, not a bodyweight one. */}
+                    {slot.bodyweight ? (
+                      <span>bodyweight · reps only</span>
+                    ) : slot.startWeight !== null ? (
                       <span>
                         start {fmtKg(slot.startWeight)} kg x {slot.startReps}
                       </span>
                     ) : (
-                      <span>bodyweight · reps only</span>
+                      <span className="text-chalk-faint">weight set on the day</span>
                     )}
                   </div>
 

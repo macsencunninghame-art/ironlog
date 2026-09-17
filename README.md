@@ -30,7 +30,7 @@ The roster is hardcoded in `src/lib/people.ts`, the same way the routines are.
 | Person | Accent | Routine |
 | --- | --- | --- |
 | Macsy | Orange | The 3-day full body split |
-| Mitchy | Lime | His own three days (`MITCHY_FULL_BODY`) |
+| Mitchy | Lime | His own three days (`MITCHY_FULL_BODY`), no starting weights |
 | Mezza | Pink | The same split, started ~45% lighter |
 | McGinley | Violet | The same split, started ~15% lighter |
 

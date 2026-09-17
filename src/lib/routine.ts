@@ -452,7 +452,7 @@ export const MITCHY_FULL_BODY: RoutineDay[] = [
         reps: 10,
         warmupSets: 2,
         bodyweight: false,
-        startWeight: 45,
+        startWeight: null,
         startReps: 10,
       },
       {
@@ -472,7 +472,7 @@ export const MITCHY_FULL_BODY: RoutineDay[] = [
         reps: 10,
         warmupSets: 0,
         bodyweight: false,
-        startWeight: 25,
+        startWeight: null,
         startReps: 10,
       },
       {
@@ -483,7 +483,7 @@ export const MITCHY_FULL_BODY: RoutineDay[] = [
         warmupSets: 0,
         bodyweight: false,
         supersetGroup: 'fb1-arms',
-        startWeight: 15,
+        startWeight: null,
         startReps: 10,
       },
       {
@@ -494,7 +494,7 @@ export const MITCHY_FULL_BODY: RoutineDay[] = [
         warmupSets: 0,
         bodyweight: false,
         supersetGroup: 'fb1-arms',
-        startWeight: 12,
+        startWeight: null,
         startReps: 10,
       },
       {
@@ -505,7 +505,7 @@ export const MITCHY_FULL_BODY: RoutineDay[] = [
         warmupSets: 0,
         bodyweight: false,
         supersetGroup: 'fb1-arms',
-        startWeight: 20,
+        startWeight: null,
         startReps: 10,
       },
       {
@@ -545,7 +545,7 @@ export const MITCHY_FULL_BODY: RoutineDay[] = [
         reps: 10,
         warmupSets: 0,
         bodyweight: false,
-        startWeight: 50,
+        startWeight: null,
         startReps: 10,
       },
       {
@@ -555,7 +555,7 @@ export const MITCHY_FULL_BODY: RoutineDay[] = [
         reps: 10,
         warmupSets: 0,
         bodyweight: false,
-        startWeight: 20,
+        startWeight: null,
         startReps: 10,
       },
       {
@@ -565,7 +565,7 @@ export const MITCHY_FULL_BODY: RoutineDay[] = [
         reps: 10,
         warmupSets: 0,
         bodyweight: false,
-        startWeight: 40,
+        startWeight: null,
         startReps: 10,
       },
       {
@@ -575,7 +575,7 @@ export const MITCHY_FULL_BODY: RoutineDay[] = [
         reps: 10,
         warmupSets: 0,
         bodyweight: false,
-        startWeight: 15,
+        startWeight: null,
         startReps: 10,
       },
       {
@@ -586,7 +586,7 @@ export const MITCHY_FULL_BODY: RoutineDay[] = [
         warmupSets: 0,
         bodyweight: false,
         supersetGroup: 'fb2-arms',
-        startWeight: 15,
+        startWeight: null,
         startReps: 10,
       },
       {
@@ -597,7 +597,7 @@ export const MITCHY_FULL_BODY: RoutineDay[] = [
         warmupSets: 0,
         bodyweight: false,
         supersetGroup: 'fb2-arms',
-        startWeight: 12,
+        startWeight: null,
         startReps: 10,
       },
       {
@@ -608,7 +608,7 @@ export const MITCHY_FULL_BODY: RoutineDay[] = [
         warmupSets: 0,
         bodyweight: false,
         supersetGroup: 'fb2-arms',
-        startWeight: 20,
+        startWeight: null,
         startReps: 10,
       },
     ],
@@ -650,7 +650,7 @@ export const MITCHY_FULL_BODY: RoutineDay[] = [
         warmupSets: 0,
         bodyweight: false,
         supersetGroup: 'fb3-lower',
-        startWeight: 20,
+        startWeight: null,
         startReps: 15,
       },
       {
@@ -661,7 +661,7 @@ export const MITCHY_FULL_BODY: RoutineDay[] = [
         warmupSets: 0,
         bodyweight: false,
         supersetGroup: 'fb3-lower',
-        startWeight: 15,
+        startWeight: null,
         startReps: 10,
       },
       {
