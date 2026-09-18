@@ -10,7 +10,14 @@ import { NoRoutine } from '@/components/NoRoutine'
 import { addPhoto } from '@/lib/photos'
 import { useObjectUrl } from '@/lib/hooks'
 import { CameraCapture } from '@/components/CameraCapture'
-import { cn, fmtVolume, toDateInputValue, fromDateInputValue, uid } from '@/lib/utils'
+import {
+  cn,
+  dayGridClass,
+  fmtVolume,
+  toDateInputValue,
+  fromDateInputValue,
+  uid,
+} from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
@@ -148,10 +155,7 @@ export function LogWorkout() {
       </div>
 
       {/* Day picker */}
-      <div
-        className="grid gap-2"
-        style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(96px, 1fr))' }}
-      >
+      <div className={cn('grid gap-2', dayGridClass(routine.length))}>
         {routine.map((d) => (
           <button
             key={d.id}

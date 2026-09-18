@@ -1,7 +1,7 @@
 import { Check } from 'lucide-react'
 import type { DayId } from '@/types'
 import type { RoutineDay } from '@/lib/routine'
-import { cn } from '@/lib/utils'
+import { cn, dayGridClass } from '@/lib/utils'
 
 interface WeekTrackerProps {
   routine: RoutineDay[]
@@ -15,10 +15,7 @@ interface WeekTrackerProps {
  */
 export function WeekTracker({ routine, done, onPick }: WeekTrackerProps) {
   return (
-    <div
-      className="grid gap-2"
-      style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(96px, 1fr))' }}
-    >
+    <div className={cn('grid gap-2', dayGridClass(routine.length))}>
       {routine.map((day) => {
         const complete = done.has(day.id)
         return (

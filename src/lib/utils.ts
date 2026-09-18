@@ -91,3 +91,20 @@ export function fromDateInputValue(value: string): Date {
   const [y, m, day] = value.split('-').map(Number)
   return new Date(y, (m ?? 1) - 1, day ?? 1)
 }
+
+/**
+ * Column layout for a row of day buttons.
+ *
+ * `auto-fit` filled the row and left the remainder stranded - four days came out
+ * as three across and one orphaned underneath. These are fixed counts instead,
+ * so every row is even: three days stay on one line, four go two-by-two on a
+ * phone and open out to a single line once there is room for it.
+ */
+export function dayGridClass(days: number): string {
+  if (days <= 1) return 'grid-cols-1'
+  if (days === 2) return 'grid-cols-2'
+  if (days === 3) return 'grid-cols-3'
+  if (days === 4) return 'grid-cols-2 sm:grid-cols-4'
+  if (days === 6) return 'grid-cols-2 sm:grid-cols-3'
+  return 'grid-cols-2 sm:grid-cols-5'
+}
