@@ -1,4 +1,9 @@
-import { FULL_BODY_3, MITCHY_FULL_BODY, scaledFullBody3, type RoutineDay } from './routine'
+import {
+  MACSY_FOUR_DAY,
+  MITCHY_FULL_BODY,
+  scaledFullBody3,
+  type RoutineDay,
+} from './routine'
 import { getActivePersonId } from './storage'
 
 /**
@@ -54,7 +59,7 @@ export const PEOPLE: Person[] = [
       accent2: '#E5157F',
       fg: '#FFFFFF',
     },
-    routine: FULL_BODY_3,
+    routine: MACSY_FOUR_DAY,
     sections: ['home', 'gym', 'hyrox', 'tri'],
   },
   {

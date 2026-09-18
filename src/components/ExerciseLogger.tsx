@@ -4,6 +4,7 @@ import { prescription, type RoutineSlot } from '@/lib/routine'
 import { checkPR, type PR } from '@/lib/stats'
 import { cn, fmtKg } from '@/lib/utils'
 import { Badge } from './ui/Badge'
+import { CategoryBadge } from './CategoryLabel'
 import { Card } from './ui/Card'
 import { Checkbox } from './ui/Checkbox'
 import { Input } from './ui/Input'
@@ -32,7 +33,7 @@ export function ExerciseLogger({ slot, logged, pr, onChange }: ExerciseLoggerPro
         // Added sets are never drop sets, so an extra set cannot silently void a PR.
         {
           weight: last?.weight ?? slot.startWeight,
-          reps: last?.reps ?? (slot.amrap ? null : slot.reps),
+          reps: last?.reps ?? (slot.amrap || slot.freeform ? null : slot.reps),
           done: false,
           isDropSet: false,
         },
@@ -63,7 +64,7 @@ export function ExerciseLogger({ slot, logged, pr, onChange }: ExerciseLoggerPro
             <h3 className="truncate text-[15px] font-bold tracking-tight">{slot.name}</h3>
             <p className="num mt-0.5 text-xs font-semibold text-chalk-muted">
               {prescription(slot)}
-              {slot.bodyweight && ' · bodyweight'}
+              {slot.freeform ? ' · log what you do' : slot.bodyweight ? ' · bodyweight' : ''}
             </p>
           </div>
 
@@ -84,34 +85,35 @@ export function ExerciseLogger({ slot, logged, pr, onChange }: ExerciseLoggerPro
           </div>
         </div>
 
-        {(slot.warmupSets > 0 || slot.supersetGroup || slot.dropSet) && (
-          <div className="mt-2.5 flex flex-wrap gap-1.5">
-            {slot.warmupSets > 0 && (
-              <Badge tone="warmup">
-                <Flame className="h-2.5 w-2.5" />
-                {slot.warmupSets} warmup
-              </Badge>
-            )}
-            {slot.supersetGroup && (
-              <Badge tone="superset">
-                <Link2 className="h-2.5 w-2.5" />
-                superset
-              </Badge>
-            )}
-            {slot.dropSet && (
-              <Badge tone="drop">
-                <TrendingDown className="h-2.5 w-2.5" />
-                drop set
-              </Badge>
-            )}
-          </div>
-        )}
+        <div className="mt-2.5 flex flex-wrap gap-1.5">
+          <CategoryBadge category={slot.category} />
+          {slot.warmupSets > 0 && (
+            <Badge tone="warmup">
+              <Flame className="h-2.5 w-2.5" />
+              {slot.warmupSets} warmup
+            </Badge>
+          )}
+          {slot.supersetGroup && (
+            <Badge tone="superset">
+              <Link2 className="h-2.5 w-2.5" />
+              superset
+            </Badge>
+          )}
+          {slot.dropSet && (
+            <Badge tone="drop">
+              <TrendingDown className="h-2.5 w-2.5" />
+              drop set
+            </Badge>
+          )}
+        </div>
       </div>
 
       <div className="p-4">
         {slot.warmupSets > 0 && (
           <div className="mb-4 flex items-center gap-3 rounded-2xl border border-sky-400/20 bg-sky-400/5 px-3 py-2.5">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-sky-700">Warmup</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-sky-700">
+              Warmup
+            </span>
             <div className="ml-auto flex gap-2">
               {logged.warmupsDone.map((done, i) => (
                 <Checkbox
@@ -169,7 +171,9 @@ export function ExerciseLogger({ slot, logged, pr, onChange }: ExerciseLoggerPro
                     placeholder="0"
                     aria-label={`Set ${i + 1} weight in kilograms`}
                     onChange={(e) =>
-                      updateSet(i, { weight: e.target.value === '' ? null : Number(e.target.value) })
+                      updateSet(i, {
+                        weight: e.target.value === '' ? null : Number(e.target.value),
+                      })
                     }
                     className="flex-1 text-center text-base font-bold"
                   />
@@ -185,7 +189,10 @@ export function ExerciseLogger({ slot, logged, pr, onChange }: ExerciseLoggerPro
                   onChange={(e) =>
                     updateSet(i, { reps: e.target.value === '' ? null : Number(e.target.value) })
                   }
-                  className={cn('flex-1 text-center text-base font-bold', slot.bodyweight && 'max-w-[140px]')}
+                  className={cn(
+                    'flex-1 text-center text-base font-bold',
+                    slot.bodyweight && 'max-w-[140px]',
+                  )}
                 />
 
                 {slot.bodyweight && (

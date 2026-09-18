@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Activity, ArrowRight, Dumbbell, Flame, Play, Trophy, TrendingUp } from 'lucide-react'
-import { EXERCISE_NAMES, dayLabel, getDay } from '@/lib/routine'
+import { dayLabel, exerciseName, getDay } from '@/lib/routine'
 import {
   currentStreak,
   daysDoneThisWeek,
@@ -115,7 +115,9 @@ export function Dashboard() {
       {/* Week goal */}
       <div>
         <div className="mb-2 flex items-baseline justify-between">
-          <h2 className="text-xs font-bold uppercase tracking-widest text-chalk-muted">This week</h2>
+          <h2 className="text-xs font-bold uppercase tracking-widest text-chalk-muted">
+            This week
+          </h2>
           <span className="num text-xs font-bold text-chalk-faint">
             {done.size} of {routine.length}
           </span>
@@ -159,11 +161,11 @@ export function Dashboard() {
       <Card className="p-5">
         <div className="mb-1 flex items-center justify-between gap-2">
           <div className="min-w-0">
-            <h2 className="truncate text-sm font-bold">{EXERCISE_NAMES[headline] ?? headline}</h2>
+            <h2 className="truncate text-sm font-bold">{exerciseName(routine, headline)}</h2>
             <p className="text-[11px] font-semibold text-chalk-faint">Top set progression</p>
           </div>
           <Link
-            to={href("/progress")}
+            to={href('/progress')}
             className="flex shrink-0 items-center gap-1 text-xs font-bold text-accent hover:text-accent-soft"
           >
             All charts
@@ -191,7 +193,7 @@ export function Dashboard() {
           <h2 className="text-sm font-bold">Recent activity</h2>
           {workouts.length > 0 && (
             <Link
-              to={href("/history")}
+              to={href('/history')}
               className="flex items-center gap-1 text-xs font-bold text-accent hover:text-accent-soft"
             >
               History
@@ -207,7 +209,7 @@ export function Dashboard() {
               return (
                 <Link
                   key={workout.id}
-                  to={href("/history")}
+                  to={href('/history')}
                   className="flex items-center gap-3 rounded-2xl bg-ink-900/50 p-3 transition-colors hover:bg-ink-700/50"
                 >
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-accent to-accent2 text-sm font-black text-accent-fg">
@@ -234,13 +236,7 @@ export function Dashboard() {
   )
 }
 
-function EmptyBlock({
-  icon: Icon,
-  text,
-}: {
-  icon: typeof Activity
-  text: string
-}) {
+function EmptyBlock({ icon: Icon, text }: { icon: typeof Activity; text: string }) {
   return (
     <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-ink-600 py-8 text-center">
       <Icon className="h-6 w-6 text-chalk-faint" />

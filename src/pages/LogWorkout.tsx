@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { CalendarDays, Camera, Check, ImagePlus, Save, Trophy, X } from 'lucide-react'
 import type { DayId, LoggedExercise, Workout } from '@/types'
-import { getDay, type RoutineSlot } from '@/lib/routine'
+import { getDay, slotsByCategory, type RoutineSlot } from '@/lib/routine'
 import { checkPR, getPR, workoutVolume } from '@/lib/stats'
 import { getWorkouts, saveWorkout } from '@/lib/workouts'
 import { usePerson } from '@/components/PersonScope'
@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
 import { ExerciseLogger } from '@/components/ExerciseLogger'
+import { CategoryHeading } from '@/components/CategoryLabel'
 
 export function LogWorkout() {
   const navigate = useNavigate()
@@ -24,7 +25,9 @@ export function LogWorkout() {
   // The valid days are whatever this person's routine defines, so the ?day= param
   // is checked against that rather than against a fixed 1-3.
   const paramDay = Number(params.get('day'))
-  const initialDay: DayId = routine.some((d) => d.id === paramDay) ? paramDay : (routine[0]?.id ?? 0)
+  const initialDay: DayId = routine.some((d) => d.id === paramDay)
+    ? paramDay
+    : (routine[0]?.id ?? 0)
 
   const [dayId, setDayId] = useState<DayId>(initialDay)
   const [date, setDate] = useState(() => toDateInputValue(new Date()))
@@ -161,10 +164,20 @@ export function LogWorkout() {
                 : 'border-ink-600 bg-ink-800/60 hover:border-ink-500',
             )}
           >
-            <div className={cn('text-[10px] font-black uppercase tracking-widest', d.id === dayId ? 'text-accent' : 'text-chalk-faint')}>
+            <div
+              className={cn(
+                'text-[10px] font-black uppercase tracking-widest',
+                d.id === dayId ? 'text-accent' : 'text-chalk-faint',
+              )}
+            >
               Day {d.id}
             </div>
-            <div className={cn('mt-0.5 truncate text-xs font-bold', d.id === dayId ? 'text-chalk' : 'text-chalk-muted')}>
+            <div
+              className={cn(
+                'mt-0.5 truncate text-xs font-bold',
+                d.id === dayId ? 'text-chalk' : 'text-chalk-muted',
+              )}
+            >
               {d.name}
             </div>
           </button>
@@ -174,7 +187,10 @@ export function LogWorkout() {
       {/* Date */}
       <Card className="flex items-center gap-3 p-4">
         <CalendarDays className="h-5 w-5 shrink-0 text-chalk-muted" />
-        <label htmlFor="workout-date" className="text-xs font-bold uppercase tracking-wider text-chalk-muted">
+        <label
+          htmlFor="workout-date"
+          className="text-xs font-bold uppercase tracking-wider text-chalk-muted"
+        >
           Date
         </label>
         <Input
@@ -187,21 +203,28 @@ export function LogWorkout() {
         />
       </Card>
 
-      {/* Exercises */}
-      <div className="space-y-3">
-        {day.slots.map((slot, i) => {
-          const entry = entries[i]
-          if (!entry) return null
-          return (
-            <ExerciseLogger
-              key={`${slot.exerciseId}-${i}`}
-              slot={slot}
-              logged={entry}
-              pr={prs.get(slot.exerciseId) ?? null}
-              onChange={(next) => setEntries((prev) => prev.map((e, j) => (j === i ? next : e)))}
-            />
-          )
-        })}
+      {/* Exercises, under the heading of the category they belong to. */}
+      <div className="space-y-6">
+        {slotsByCategory(day.slots).map((section) => (
+          <div key={`${section.category}-${section.slots[0].index}`} className="space-y-3">
+            <CategoryHeading category={section.category} count={section.slots.length} />
+            {section.slots.map(({ slot, index: i }) => {
+              const entry = entries[i]
+              if (!entry) return null
+              return (
+                <ExerciseLogger
+                  key={`${slot.exerciseId}-${i}`}
+                  slot={slot}
+                  logged={entry}
+                  pr={prs.get(slot.exerciseId) ?? null}
+                  onChange={(next) =>
+                    setEntries((prev) => prev.map((e, j) => (j === i ? next : e)))
+                  }
+                />
+              )
+            })}
+          </div>
+        ))}
       </div>
 
       {/* Session photo */}
@@ -347,7 +370,8 @@ function blankEntry(slot: RoutineSlot, history: Workout[]): LoggedExercise {
       weight: slot.bodyweight ? null : weight,
       // A "Max" set starts empty rather than at zero: the prescription is to go to
       // failure, so there is no number to suggest until they have done it once.
-      reps: reps ?? (slot.amrap ? null : slot.reps),
+      // Skill practice is the same - there is no prescribed count to suggest.
+      reps: reps ?? (slot.amrap || slot.freeform ? null : slot.reps),
       done: false,
       isDropSet: Boolean(slot.dropSet) && i === slot.sets - 1,
     })),

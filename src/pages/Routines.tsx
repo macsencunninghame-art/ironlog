@@ -1,10 +1,11 @@
 import { Flame, Link2, Lock, TrendingDown } from 'lucide-react'
-import { prescription } from '@/lib/routine'
+import { prescription, slotsByCategory } from '@/lib/routine'
 import { usePerson } from '@/components/PersonScope'
 import { NoRoutine } from '@/components/NoRoutine'
 import { fmtKg } from '@/lib/utils'
 import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
+import { CategoryHeading } from '@/components/CategoryLabel'
 
 export function Routines() {
   const { person, routine } = usePerson()
@@ -53,54 +54,62 @@ export function Routines() {
           </div>
 
           <div className="divide-y divide-ink-600/40">
-            {day.slots.map((slot, i) => (
-              <div key={`${slot.exerciseId}-${i}`} className="flex items-start gap-3 p-4">
-                <span className="num mt-0.5 w-5 shrink-0 text-xs font-black text-chalk-faint">
-                  {i + 1}
-                </span>
+            {slotsByCategory(day.slots).map((section) => (
+              <div key={`${section.category}-${section.slots[0].index}`} className="p-4">
+                <CategoryHeading category={section.category} count={section.slots.length} />
 
-                <div className="min-w-0 flex-1">
-                  <h3 className="text-sm font-bold leading-snug">{slot.name}</h3>
-
-                  <div className="num mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-semibold text-chalk-muted">
-                    <span className="text-accent">
-                      {prescription(slot)}
-                    </span>
-                    {/* Bodyweight is its own flag. A weighted lift with no starting
-                        number is simply one nobody has done yet, not a bodyweight one. */}
-                    {slot.bodyweight ? (
-                      <span>bodyweight · reps only</span>
-                    ) : slot.startWeight !== null ? (
-                      <span>
-                        start {fmtKg(slot.startWeight)} kg x {slot.startReps}
+                <div className="mt-3 space-y-3">
+                  {section.slots.map(({ slot, index: i }) => (
+                    <div key={`${slot.exerciseId}-${i}`} className="flex items-start gap-3">
+                      <span className="num mt-0.5 w-5 shrink-0 text-xs font-black text-chalk-faint">
+                        {i + 1}
                       </span>
-                    ) : (
-                      <span className="text-chalk-faint">weight set on the day</span>
-                    )}
-                  </div>
 
-                  {(slot.warmupSets > 0 || slot.supersetGroup || slot.dropSet) && (
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                      {slot.warmupSets > 0 && (
-                        <Badge tone="warmup">
-                          <Flame className="h-2.5 w-2.5" />
-                          {slot.warmupSets} warmup
-                        </Badge>
-                      )}
-                      {slot.supersetGroup && (
-                        <Badge tone="superset">
-                          <Link2 className="h-2.5 w-2.5" />
-                          superset
-                        </Badge>
-                      )}
-                      {slot.dropSet && (
-                        <Badge tone="drop">
-                          <TrendingDown className="h-2.5 w-2.5" />
-                          last set drop
-                        </Badge>
-                      )}
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-sm font-bold leading-snug">{slot.name}</h3>
+
+                        <div className="num mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-semibold text-chalk-muted">
+                          <span className="text-accent">{prescription(slot)}</span>
+                          {/* Bodyweight is its own flag. A weighted lift with no starting
+                        number is simply one nobody has done yet, not a bodyweight one. */}
+                          {slot.freeform ? (
+                            <span>no set or rep target · log what you do</span>
+                          ) : slot.bodyweight ? (
+                            <span>bodyweight · reps only</span>
+                          ) : slot.startWeight !== null ? (
+                            <span>
+                              start {fmtKg(slot.startWeight)} kg x {slot.startReps}
+                            </span>
+                          ) : (
+                            <span className="text-chalk-faint">weight set on the day</span>
+                          )}
+                        </div>
+
+                        {(slot.warmupSets > 0 || slot.supersetGroup || slot.dropSet) && (
+                          <div className="mt-2 flex flex-wrap gap-1.5">
+                            {slot.warmupSets > 0 && (
+                              <Badge tone="warmup">
+                                <Flame className="h-2.5 w-2.5" />
+                                {slot.warmupSets} warmup
+                              </Badge>
+                            )}
+                            {slot.supersetGroup && (
+                              <Badge tone="superset">
+                                <Link2 className="h-2.5 w-2.5" />
+                                superset
+                              </Badge>
+                            )}
+                            {slot.dropSet && (
+                              <Badge tone="drop">
+                                <TrendingDown className="h-2.5 w-2.5" />
+                                last set drop
+                              </Badge>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  )}
+                  ))}
                 </div>
               </div>
             ))}

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { BarChart3, LineChart as LineIcon, Trophy } from 'lucide-react'
-import { allTrackedExercises } from '@/lib/routine'
+import { CATEGORIES, allTrackedExercises } from '@/lib/routine'
 import { usePerson } from '@/components/PersonScope'
 import { NoRoutine } from '@/components/NoRoutine'
 import { CompareBoard } from '@/components/CompareBoard'
@@ -73,99 +73,106 @@ export function Progress() {
         <NoRoutine name={person.name} action="chart" />
       ) : (
         <>
-      {/* Exercise progression */}
-      <Card className="p-5">
-        <div className="mb-4 flex items-center gap-2">
-          <LineIcon className="h-4 w-4 text-accent" />
-          <h2 className="text-sm font-bold">Exercise progression</h2>
-        </div>
-
-        <Select value={exerciseId} onChange={(e) => setExerciseId(e.target.value)}>
-          {exercises.map((ex) => (
-            <option key={ex.id} value={ex.id}>
-              {ex.name}
-              {withData.has(ex.id) ? '' : ' — no data yet'}
-            </option>
-          ))}
-        </Select>
-
-        {!selected?.bodyweight && (
-          <div className="mt-3 flex gap-2">
-            <MetricTab active={metric === 'weight'} onClick={() => setMetric('weight')}>
-              Top set
-            </MetricTab>
-            <MetricTab active={metric === 'e1rm'} onClick={() => setMetric('e1rm')}>
-              Est. 1RM
-            </MetricTab>
-          </div>
-        )}
-
-        {pr && (
-          <div className="mt-3 flex items-center gap-2 rounded-2xl border border-volt/25 bg-volt/8 px-3 py-2">
-            <Trophy className="h-4 w-4 shrink-0 text-volt" />
-            <span className="text-[11px] font-bold uppercase tracking-wider text-chalk-muted">
-              Personal record
-            </span>
-            <span className="num ml-auto text-sm font-black text-volt">
-              {pr.bodyweight
-                ? `${pr.topSetReps} reps`
-                : `${fmtKg(pr.topSetWeight)} kg x ${pr.topSetReps}`}
-            </span>
-          </div>
-        )}
-
-        <div className="mt-4">
-          {series.length >= 2 ? (
-            <LineChart
-              points={series}
-              height={260}
-              color="#FF6B18"
-              suffix={selected?.bodyweight ? 'reps' : 'kg'}
-            />
-          ) : (
-            <Empty
-              text={
-                series.length === 1
-                  ? 'One session logged. Log this lift again to draw the line.'
-                  : 'No sessions logged for this lift yet.'
-              }
-            />
-          )}
-        </div>
-      </Card>
-
-      {/* Weekly volume */}
-      <Card className="p-5">
-        <div className="mb-1 flex items-center gap-2">
-          <BarChart3 className="h-4 w-4 text-accent2" />
-          <h2 className="text-sm font-bold">Weekly volume</h2>
-        </div>
-        <p className="mb-4 text-[11px] font-semibold text-chalk-faint">
-          Last 12 weeks · weight x reps on completed sets
-        </p>
-
-        {hasVolume ? (
-          <>
-            <BarChart data={volumeData} height={240} />
-            <div className="num mt-3 flex justify-between border-t border-ink-600/50 pt-3 text-[11px] font-bold text-chalk-muted">
-              <span>
-                Best week{' '}
-                <span className="text-chalk">
-                  {fmtVolume(Math.max(...weeks.map((w) => w.volume)))} kg
-                </span>
-              </span>
-              <span>
-                Total{' '}
-                <span className="text-chalk">
-                  {fmtVolume(weeks.reduce((n, w) => n + w.volume, 0))} kg
-                </span>
-              </span>
+          {/* Exercise progression */}
+          <Card className="p-5">
+            <div className="mb-4 flex items-center gap-2">
+              <LineIcon className="h-4 w-4 text-accent" />
+              <h2 className="text-sm font-bold">Exercise progression</h2>
             </div>
-          </>
-        ) : (
-          <Empty text="No volume yet. Save a session and this fills in." />
-        )}
-      </Card>
+
+            {/* Grouped by category so a long list stays readable. */}
+            <Select value={exerciseId} onChange={(e) => setExerciseId(e.target.value)}>
+              {CATEGORIES.filter((c) => exercises.some((ex) => ex.category === c.id)).map((c) => (
+                <optgroup key={c.id} label={c.name}>
+                  {exercises
+                    .filter((ex) => ex.category === c.id)
+                    .map((ex) => (
+                      <option key={ex.id} value={ex.id}>
+                        {ex.name}
+                        {withData.has(ex.id) ? '' : ' — no data yet'}
+                      </option>
+                    ))}
+                </optgroup>
+              ))}
+            </Select>
+
+            {!selected?.bodyweight && (
+              <div className="mt-3 flex gap-2">
+                <MetricTab active={metric === 'weight'} onClick={() => setMetric('weight')}>
+                  Top set
+                </MetricTab>
+                <MetricTab active={metric === 'e1rm'} onClick={() => setMetric('e1rm')}>
+                  Est. 1RM
+                </MetricTab>
+              </div>
+            )}
+
+            {pr && (
+              <div className="mt-3 flex items-center gap-2 rounded-2xl border border-volt/25 bg-volt/8 px-3 py-2">
+                <Trophy className="h-4 w-4 shrink-0 text-volt" />
+                <span className="text-[11px] font-bold uppercase tracking-wider text-chalk-muted">
+                  Personal record
+                </span>
+                <span className="num ml-auto text-sm font-black text-volt">
+                  {pr.bodyweight
+                    ? `${pr.topSetReps} reps`
+                    : `${fmtKg(pr.topSetWeight)} kg x ${pr.topSetReps}`}
+                </span>
+              </div>
+            )}
+
+            <div className="mt-4">
+              {series.length >= 2 ? (
+                <LineChart
+                  points={series}
+                  height={260}
+                  color="#FF6B18"
+                  suffix={selected?.bodyweight ? 'reps' : 'kg'}
+                />
+              ) : (
+                <Empty
+                  text={
+                    series.length === 1
+                      ? 'One session logged. Log this lift again to draw the line.'
+                      : 'No sessions logged for this lift yet.'
+                  }
+                />
+              )}
+            </div>
+          </Card>
+
+          {/* Weekly volume */}
+          <Card className="p-5">
+            <div className="mb-1 flex items-center gap-2">
+              <BarChart3 className="h-4 w-4 text-accent2" />
+              <h2 className="text-sm font-bold">Weekly volume</h2>
+            </div>
+            <p className="mb-4 text-[11px] font-semibold text-chalk-faint">
+              Last 12 weeks · weight x reps on completed sets
+            </p>
+
+            {hasVolume ? (
+              <>
+                <BarChart data={volumeData} height={240} />
+                <div className="num mt-3 flex justify-between border-t border-ink-600/50 pt-3 text-[11px] font-bold text-chalk-muted">
+                  <span>
+                    Best week{' '}
+                    <span className="text-chalk">
+                      {fmtVolume(Math.max(...weeks.map((w) => w.volume)))} kg
+                    </span>
+                  </span>
+                  <span>
+                    Total{' '}
+                    <span className="text-chalk">
+                      {fmtVolume(weeks.reduce((n, w) => n + w.volume, 0))} kg
+                    </span>
+                  </span>
+                </div>
+              </>
+            ) : (
+              <Empty text="No volume yet. Save a session and this fills in." />
+            )}
+          </Card>
         </>
       )}
     </div>
