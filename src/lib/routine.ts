@@ -928,7 +928,7 @@ export const MACSY_FOUR_DAY: RoutineDay[] = [
   {
     id: 1,
     name: 'Ground & Grip',
-    subtitle: 'Squat / Pull-Up / Arms',
+    subtitle: 'Squat / Pull-Up / Row',
     slots: [
       {
         exerciseId: 'handstand-practice',
@@ -978,6 +978,17 @@ export const MACSY_FOUR_DAY: RoutineDay[] = [
         dropSet: true,
         startWeight: 30,
         startReps: 8,
+      },
+      {
+        exerciseId: 'chest-supported-row',
+        name: 'Chest Supported Row',
+        category: 'main',
+        sets: 2,
+        reps: 10,
+        warmupSets: 0,
+        bodyweight: false,
+        startWeight: 140,
+        startReps: 10,
       },
       {
         exerciseId: 'standing-calf-raise',
@@ -1098,17 +1109,6 @@ export const MACSY_FOUR_DAY: RoutineDay[] = [
         startReps: 3,
       },
       {
-        exerciseId: 'chest-supported-row',
-        name: 'Chest Supported Row',
-        category: 'main',
-        sets: 2,
-        reps: 10,
-        warmupSets: 0,
-        bodyweight: false,
-        startWeight: 140,
-        startReps: 10,
-      },
-      {
         exerciseId: 'adductor-machine',
         name: 'Adductor Machine',
         category: 'structural',
@@ -1162,7 +1162,7 @@ export const MACSY_FOUR_DAY: RoutineDay[] = [
   {
     id: 3,
     name: 'Pull Peak',
-    subtitle: 'Heavy Pull-Up / Squat / Incline',
+    subtitle: 'Heavy Pull-Up / Squat / Legs',
     slots: [
       {
         exerciseId: 'handstand-practice',
@@ -1214,16 +1214,17 @@ export const MACSY_FOUR_DAY: RoutineDay[] = [
         startReps: 6,
       },
       {
-        exerciseId: 'incline-dumbbell-press',
-        name: 'Incline DB Bench',
-        category: 'main',
-        sets: 2,
-        reps: 8,
-        repsMax: 10,
-        warmupSets: 2,
+        exerciseId: 'one-legged-rdls',
+        name: 'Single-Leg RDL',
+        category: 'structural',
+        sets: 3,
+        reps: 10,
+        repsMax: 12,
+        perSide: true,
+        warmupSets: 0,
         bodyweight: false,
-        startWeight: 35,
-        startReps: 8,
+        startWeight: 20,
+        startReps: 10,
       },
       {
         exerciseId: 'standing-calf-raise',
@@ -1267,7 +1268,7 @@ export const MACSY_FOUR_DAY: RoutineDay[] = [
   {
     id: 4,
     name: 'Hinge & Rise',
-    subtitle: 'Deadlift / Muscle-Up / Legs',
+    subtitle: 'Deadlift / Incline / Muscle-Up',
     slots: [
       {
         exerciseId: 'handstand-practice',
@@ -1306,6 +1307,18 @@ export const MACSY_FOUR_DAY: RoutineDay[] = [
         startReps: 5,
       },
       {
+        exerciseId: 'incline-dumbbell-press',
+        name: 'Incline DB Bench',
+        category: 'main',
+        sets: 2,
+        reps: 8,
+        repsMax: 10,
+        warmupSets: 2,
+        bodyweight: false,
+        startWeight: 35,
+        startReps: 8,
+      },
+      {
         exerciseId: 'weighted-muscle-ups',
         name: 'Weighted Muscle-Up',
         category: 'main',
@@ -1330,19 +1343,6 @@ export const MACSY_FOUR_DAY: RoutineDay[] = [
         bodyweight: false,
         startWeight: 40,
         startReps: 8,
-      },
-      {
-        exerciseId: 'one-legged-rdls',
-        name: 'Single-Leg RDL',
-        category: 'structural',
-        sets: 3,
-        reps: 10,
-        repsMax: 12,
-        perSide: true,
-        warmupSets: 0,
-        bodyweight: false,
-        startWeight: 20,
-        startReps: 10,
       },
       {
         exerciseId: 'seated-calf-raise',
